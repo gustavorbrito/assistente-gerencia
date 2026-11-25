@@ -69,6 +69,12 @@ h2{
   font-family:"Cormorant Garamond",Georgia,serif;
   font-size:22px;font-weight:700;line-height:1.15;margin:0 0 10px
 }
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.card-head h2{margin:0}
+.month-pick{
+  width:auto;min-height:40px;padding:6px 10px;margin:0;font-size:14px;font-weight:600;
+  border-radius:10px;background:var(--inp);color:var(--tx);border:1px solid var(--bd)
+}
 h3{
   font-size:12px;font-weight:700;margin:14px 0 6px;color:var(--mut);
   text-transform:uppercase;letter-spacing:.06em
@@ -211,7 +217,10 @@ a{text-decoration:none;color:inherit}
   </div>
 
   <div class="card">
-    <h2>Controle mensal (<span id="monthLabel"></span>)</h2>
+    <div class="card-head">
+      <h2>Controle mensal</h2>
+      <input type="month" id="monthPicker" class="month-pick" onchange="onSelectMonth(this.value)" aria-label="Selecionar mês">
+    </div>
     <div class="g2">
       <label class="f">Meta mensal da loja (R$)<input id="m_meta" type="number" inputmode="decimal" step="any" placeholder="Ex: 65000" oninput="mmv()"></label>
       <label class="f">Acumulado no mês (R$)<input id="m_vend" type="number" inputmode="decimal" step="any" placeholder="Ex: 32400" oninput="mmv()"></label>
@@ -221,7 +230,7 @@ a{text-decoration:none;color:inherit}
     <div class="kpis" id="mkpis"></div>
     <div class="g2" style="margin-top:10px">
       <button onclick="closeDayToMonth()">✅ Fechar dia e somar no mês</button>
-      <button class="s" onclick="resetMonth()">↺ Zerar mês</button>
+      <button class="s" onclick="resetMonth()">↺ Zerar mês selecionado</button>
     </div>
     <div id="monthTeamSummary"></div>
   </div>
@@ -343,8 +352,11 @@ a{text-decoration:none;color:inherit}
     </div>
     <div id="cont"></div>
   </details>
-  <details class="card" open><summary>🗓️ Histórico e resumo mensal</summary>
-    <button class="w" onclick="saveHist()">💾 Salvar fechamento de hoje</button>
+  <details class="card" open><summary>🗓️ Histórico e consulta por mês</summary>
+    <div class="g2" style="margin-bottom:10px">
+      <button onclick="saveHist()">💾 Salvar fechamento de hoje</button>
+      <select id="histMonthFilter" onchange="onFilterHistMonth(this.value)" style="margin:0" aria-label="Filtrar histórico por mês"></select>
+    </div>
     <div id="monthSummaryBox"></div>
     <div id="hist"></div>
   </details>
@@ -365,6 +377,7 @@ a{text-decoration:none;color:inherit}
 
 <script>
 var DIAS=["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"],OPT=["","M","T","I","F","V"],LAB=["—","Manhã","Tarde","Integral","Folga","Férias"];
+var MESES_NOMES=["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
 var TPL={
   bom:{n:"☀️ Bom dia e Meta do Dia",t:"☀️ Bom dia, equipe!\n\nHoje ({data}) nossa meta na loja é {meta}.\nMeta base por pessoa: {indiv} | Meta PA: {pa}.\nAcumulado do mês: {vendido_mes} de {meta_mes} ({pct_mes}).\nFoco do dia: {foco}\n\nVamos com experimentação no balcão, kits presente e encantamento! ❤️"},
   par:{n:"📊 Parcial do Dia",t:"📊 Parcial do dia ({data})\n\nVendido até agora: {vendido}\nMeta do dia: {meta} ({pct})\nFalta hoje: {falta} | Falta no mês: {falta_mes}\n\n{equipe_vendas}\n\nRitmo necessário: {porhora}/h até o fechamento. Foco em {foco}! 🔥"},
@@ -373,6 +386,7 @@ var TPL={
 };
 var DEF={
   theme:"light",meta:"",vend:"",hrs:"",nv:"",pa_meta:"",foco_dia:"",
+  sel_month:"",hist_filter:"",months:{},
   m_meta:"",m_vend:"",m_ref:"",m_sell_vend:{},
   calc:{v:"",d:"",p:"",j:""},edit:false,
   chk:{
@@ -382,11 +396,35 @@ var DEF={
   },
   done:{},pend:[],sell:[],esc:{},sales:[],msgs:{},fm:"",fv:"",tab:0,rank:{},com:"",estq:[],cont:[],hist:[],note:""
 };
-function currentMonthKey(){
+
+function currentIsoMonth(){
   var d=new Date();
-  var m=String(d.getMonth()+1).padStart(2,"0");
-  return m+"/"+d.getFullYear();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
 }
+function brDateToIsoMonth(brDate){
+  var parts=String(brDate||"").split("/");
+  if(parts.length===3&&parts[2].length===4){
+    return parts[2]+"-"+parts[1].padStart(2,"0");
+  }
+  return currentIsoMonth();
+}
+function formatIsoMonthLabel(iso){
+  var p=String(iso||"").split("-");
+  if(p.length!==2)return iso||"";
+  var mIdx=parseInt(p[1],10)-1;
+  return (MESES_NOMES[mIdx]||p[1])+"/"+p[0];
+}
+function ensureMonthRecord(iso){
+  var key=iso||currentIsoMonth();
+  if(!S.months[key]||typeof S.months[key]!=="object"){
+    S.months[key]={meta:"",vend:"",sell:{}};
+  }
+  if(!S.months[key].sell||typeof S.months[key].sell!=="object"){
+    S.months[key].sell={};
+  }
+  return S.months[key];
+}
+
 function normalizeState(obj){
   var base=JSON.parse(JSON.stringify(DEF));
   if(obj&&typeof obj==="object"){
@@ -401,6 +439,7 @@ function normalizeState(obj){
   if(!Array.isArray(base.estq))base.estq=[];
   if(!Array.isArray(base.cont))base.cont=[];
   if(!Array.isArray(base.hist))base.hist=[];
+  if(!base.months||typeof base.months!=="object")base.months={};
   if(!base.rank||typeof base.rank!=="object")base.rank={};
   if(!base.m_sell_vend||typeof base.m_sell_vend!=="object")base.m_sell_vend={};
   if(!base.esc||typeof base.esc!=="object")base.esc={};
@@ -408,9 +447,29 @@ function normalizeState(obj){
   if(!base.calc||typeof base.calc!=="object")base.calc={v:"",d:"",p:"",j:""};
   if(!base.chk||typeof base.chk!=="object")base.chk=JSON.parse(JSON.stringify(DEF.chk));
   if(!base.done||typeof base.done!=="object")base.done={};
-  if(!base.m_ref)base.m_ref=currentMonthKey();
+
+  var curIso=currentIsoMonth();
+  if(!base.sel_month)base.sel_month=curIso;
+  if(!base.hist_filter)base.hist_filter=base.sel_month;
+
+  // Migra dados legados (m_meta / m_vend / m_sell_vend) para S.months
+  if(!base.months[curIso]){
+    base.months[curIso]={
+      meta:base.m_meta||"",
+      vend:base.m_vend||"",
+      sell:Object.assign({},base.m_sell_vend||{})
+    };
+  }
+  // Garante que meses presentes no histórico existam em S.months
+  base.hist.forEach(function(h){
+    var mKey=brDateToIsoMonth(h.d);
+    if(!base.months[mKey]){
+      base.months[mKey]={meta:"",vend:"",sell:{}};
+    }
+  });
   return base;
 }
+
 var S=normalizeState(null);
 try{
   var raw=localStorage.getItem("ag_v1");
@@ -452,8 +511,9 @@ function sellerTotal(id){
   var manual=n(S.rank[id]);
   return Math.max(fromLogs,manual);
 }
-function sellerMonthTotal(id){
-  return n(S.m_sell_vend[id]);
+function sellerMonthTotal(id,isoMonth){
+  var rec=ensureMonthRecord(isoMonth||S.sel_month||currentIsoMonth());
+  return n(rec.sell[id]);
 }
 function teamSalesTotal(){
   var seen={};
@@ -469,8 +529,9 @@ function teamSalesTotal(){
 }
 function teamSalesSummaryText(){
   if(!S.sell.length)return"Equipe: sem vendedores cadastrados.";
-  return "Vendas da equipe (dia / mês):\n"+S.sell.map(function(s){
-    var t=sellerTotal(s.id),m=n(s.goal),mt=sellerMonthTotal(s.id),mg=n(s.mGoal);
+  var activeIso=S.sel_month||currentIsoMonth();
+  return "Vendas da equipe (dia / "+formatIsoMonthLabel(activeIso)+"):\n"+S.sell.map(function(s){
+    var t=sellerTotal(s.id),m=n(s.goal),mt=sellerMonthTotal(s.id,activeIso),mg=n(s.mGoal);
     var dayStr=R(t)+(m>0?" ("+(t/m*100).toFixed(0)+"% meta dia)":"");
     var monStr="Mês: "+R(mt)+(mg>0?" ("+(mt/mg*100).toFixed(0)+"% meta mês)":"");
     return "• "+s.n+": "+dayStr+" | "+monStr;
@@ -602,87 +663,134 @@ function rSales(){
     }).join("");
 }
 
-/* CONTROLE MENSAL */
-function monthStats(){
-  var mm=n(S.m_meta),mv=n(S.m_vend),mf=Math.max(0,mm-mv);
-  var now=new Date();
-  var totalDays=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
-  var remDays=Math.max(1,totalDays-now.getDate()+1);
+/* CONTROLE MENSAL COM SELETOR DE MÊS */
+function onSelectMonth(iso){
+  if(!iso)return;
+  S.sel_month=iso;
+  S.hist_filter=iso;
+  ensureMonthRecord(iso);
+  save();
+  rMonth();
+  if($("t4").classList.contains("on")){rMonthSummary();rHist();}
+}
+function monthStats(iso){
+  var targetIso=iso||S.sel_month||currentIsoMonth();
+  var rec=ensureMonthRecord(targetIso);
+  var mm=n(rec.meta),mv=n(rec.vend),mf=Math.max(0,mm-mv);
+  var parts=targetIso.split("-");
+  var y=parseInt(parts[0],10),m=parseInt(parts[1],10);
+  var totalDays=new Date(y,m,0).getDate();
+  var curIso=currentIsoMonth();
+  var remDays=totalDays;
+  if(targetIso===curIso){
+    remDays=Math.max(1,totalDays-new Date().getDate()+1);
+  }
   return{
-    mm:mm,mv:mv,mf:mf,
+    iso:targetIso,mm:mm,mv:mv,mf:mf,
     pct:mm>0?Math.min(100,mv/mm*100):0,
     dailyNeed:mf/remDays,
-    remDays:remDays
+    remDays:remDays,
+    isCurrent:targetIso===curIso
   };
 }
 function mmv(){
-  S.m_meta=$("m_meta").value;
-  S.m_vend=$("m_vend").value;
-  S.m_ref=currentMonthKey();
+  var iso=S.sel_month||currentIsoMonth();
+  var rec=ensureMonthRecord(iso);
+  rec.meta=$("m_meta").value;
+  rec.vend=$("m_vend").value;
+  if(iso===currentIsoMonth()){
+    S.m_meta=rec.meta;
+    S.m_vend=rec.vend;
+  }
   save();rMonth();
 }
 function closeDayToMonth(){
   var s=stats();
   var dayVal=s.v>0?s.v:teamSalesTotal();
   if(dayVal<=0){alert("Informe ou registre o vendido do dia antes de fechar.");return;}
-  if(!confirm("Salvar fechamento de hoje ("+R(dayVal)+") no histórico e somar no acumulado do mês?"))return;
-  var d=new Date().toLocaleDateString("pt-BR");
-  var prevEntry=S.hist.find(function(x){return x.d===d;});
+  var todayBr=new Date().toLocaleDateString("pt-BR");
+  var targetIso=S.sel_month||currentIsoMonth();
+  if(!confirm("Salvar fechamento de hoje ("+R(dayVal)+") e somar em "+formatIsoMonthLabel(targetIso)+"?"))return;
+
+  var rec=ensureMonthRecord(targetIso);
+  var prevEntry=S.hist.find(function(x){return x.d===todayBr;});
   var prevVal=prevEntry?n(prevEntry.v):0;
   var diff=dayVal-prevVal;
-  S.m_vend=String(Math.max(0,n(S.m_vend)+diff));
-  S.m_ref=currentMonthKey();
+  rec.vend=String(Math.max(0,n(rec.vend)+diff));
+  if(targetIso===currentIsoMonth()){
+    S.m_vend=rec.vend;
+  }
   S.sell.forEach(function(sl){
     var vToday=sellerTotal(sl.id);
     if(vToday>0){
-      S.m_sell_vend[sl.id]=String(n(S.m_sell_vend[sl.id])+vToday);
+      rec.sell[sl.id]=String(n(rec.sell[sl.id])+vToday);
     }
   });
   var mGoal=s.m>0?s.m:(prevEntry?n(prevEntry.m):0);
-  S.hist=S.hist.filter(function(x){return x.d!==d;});
-  S.hist.unshift({d:d,m:mGoal,v:dayVal});
-  S.hist=S.hist.slice(0,60);
-  if($("m_vend"))$("m_vend").value=S.m_vend;
+  var sellerSnap={};
+  S.sell.forEach(function(sl){
+    var vt=sellerTotal(sl.id);
+    if(vt>0)sellerSnap[sl.id]=vt;
+  });
+  S.hist=S.hist.filter(function(x){return x.d!==todayBr;});
+  S.hist.unshift({d:todayBr,m:mGoal,v:dayVal,month:targetIso,sellers:sellerSnap});
+  S.hist=S.hist.slice(0,180);
+  S.hist_filter=targetIso;
   save();
   rMonth();
   rSales();
   if($("t4").classList.contains("on")){rMais();}
-  alert("Fechamento salvo e acumulado mensal atualizado!");
+  alert("Fechamento salvo e acumulado de "+formatIsoMonthLabel(targetIso)+" atualizado!");
 }
 function resetMonth(){
-  if(!confirm("Zerar o acumulado mensal da loja e dos vendedores para este mês?"))return;
-  S.m_vend="";
-  S.m_sell_vend={};
-  S.m_ref=currentMonthKey();
-  if($("m_vend"))$("m_vend").value="";
+  var iso=S.sel_month||currentIsoMonth();
+  if(!confirm("Zerar o acumulado mensal da loja e dos vendedores em "+formatIsoMonthLabel(iso)+"?"))return;
+  var rec=ensureMonthRecord(iso);
+  rec.vend="";
+  rec.sell={};
+  if(iso===currentIsoMonth()){
+    S.m_vend="";
+    S.m_sell_vend={};
+  }
   save();
   rMonth();
 }
 function editSellerMonth(id){
   var sl=S.sell.find(function(x){return x.id===id;});
   if(!sl)return;
-  var cur=sellerMonthTotal(id);
-  var res=prompt("Acumulado mensal de "+sl.n+" (R$):",cur>0?String(cur).replace(".",","):"0");
+  var iso=S.sel_month||currentIsoMonth();
+  var rec=ensureMonthRecord(iso);
+  var cur=n(rec.sell[id]);
+  var res=prompt("Acumulado de "+sl.n+" em "+formatIsoMonthLabel(iso)+" (R$):",cur>0?String(cur).replace(".",","):"0");
   if(res===null)return;
   var val=n(res);
-  S.m_sell_vend[id]=val>0?String(val):"";
+  rec.sell[id]=val>0?String(val):"";
   save();rMonth();
 }
 function rMonth(){
   if(!$("m_meta")||!$("m_vend"))return;
-  if($("monthLabel"))$("monthLabel").textContent=S.m_ref||currentMonthKey();
-  var ms=monthStats();
+  var iso=S.sel_month||currentIsoMonth();
+  S.sel_month=iso;
+  var rec=ensureMonthRecord(iso);
+  if($("monthPicker"))$("monthPicker").value=iso;
+  $("m_meta").value=rec.meta||"";
+  $("m_vend").value=rec.vend||"";
+
+  var ms=monthStats(iso);
   $("mbarf").style.width=ms.pct+"%";
   $("mbar").classList.toggle("ok",ms.mm>0&&ms.mf===0);
   $("mpct").textContent=ms.mm>0
-    ?(ms.mf===0?"🎉 Meta mensal batida! ":"")+ms.pct.toFixed(1).replace(".",",")+"% da meta mensal"
-    :"Informe a meta mensal da loja para acompanhar";
+    ?(ms.mf===0?"🎉 Meta mensal batida! ":"")+ms.pct.toFixed(1).replace(".",",")+"% da meta de "+formatIsoMonthLabel(iso)
+    :"Informe a meta mensal de "+formatIsoMonthLabel(iso);
+
+  var histItems=S.hist.filter(function(h){return (h.month||brDateToIsoMonth(h.d))===iso;});
+  var hitDays=histItems.filter(function(x){return n(x.m)>0&&n(x.v)>=n(x.m);}).length;
+
   var k=function(l,v,w){return '<div class="kpi'+(w?" wide":"")+'"><small>'+l+'</small><b>'+v+'</b></div>';};
   $("mkpis").innerHTML=
-    k("Falta no mês",R(ms.mf),1)+
-    k("Ritmo médio / dia ("+ms.remDays+"d)",ms.mm>0?R(ms.dailyNeed):"—")+
-    k("Meta mensal",ms.mm>0?R(ms.mm):"—")+
-    k("Acumulado mês",R(ms.mv));
+    k("Falta no mês ("+formatIsoMonthLabel(iso)+")",R(ms.mf),1)+
+    k(ms.isCurrent?"Ritmo / dia ("+ms.remDays+"d rest.)":"Média / dia ("+ms.remDays+"d)",ms.mm>0?R(ms.dailyNeed):"—")+
+    k("Fechamentos registrados",histItems.length+" dia(s) · "+hitDays+" meta(s)");
 
   var teamBox=$("monthTeamSummary");
   if(!teamBox)return;
@@ -691,14 +799,14 @@ function rMonth(){
     return;
   }
   teamBox.innerHTML=
-    '<h3>Acumulado mensal por vendedor</h3>'+
+    '<h3>Acumulado por vendedor em '+formatIsoMonthLabel(iso)+'</h3>'+
     S.sell.map(function(s){
-      var mt=sellerMonthTotal(s.id);
+      var mt=sellerMonthTotal(s.id,iso);
       var mg=n(s.mGoal);
       var pct=mg>0?Math.min(100,mt/mg*100):0;
       return '<div class="v-card" onclick="editSellerMonth(\''+s.id+'\')" style="cursor:pointer">'+
         '<div class="v-top"><span class="v-name">'+esc(s.n)+'</span><span class="v-tot">'+R(mt)+'</span></div>'+
-        '<div class="v-sub">'+(mg>0?"Meta mês: "+R(mg)+" ("+(mt/mg*100).toFixed(0)+"%) · Falta: "+R(Math.max(0,mg-mt)):"Toque para ajustar acumulado mensal")+'</div>'+
+        '<div class="v-sub">'+(mg>0?"Meta mês: "+R(mg)+" ("+(mt/mg*100).toFixed(0)+"%) · Falta: "+R(Math.max(0,mg-mt)):"Toque para editar acumulado de "+formatIsoMonthLabel(iso))+'</div>'+
         (mg>0?'<div class="v-bar '+(mt>=mg?"ok":"")+'"><i style="width:'+pct+'%"></i></div>':"")+
       '</div>';
     }).join("");
@@ -828,7 +936,9 @@ function editOrRemoveSell(i){
     if(confirm("Remover "+s.n+" da equipe?")){
       delete S.esc[s.id];
       delete S.rank[s.id];
-      delete S.m_sell_vend[s.id];
+      Object.keys(S.months).forEach(function(mk){
+        if(S.months[mk]&&S.months[mk].sell)delete S.months[mk].sell[s.id];
+      });
       S.sales=S.sales.filter(function(x){return x.sid!==s.id;});
       S.sell.splice(i,1);
       save();rTodayShift();rGrade();rSales();rMonth();
@@ -876,7 +986,7 @@ function stockSummaryText(){
   return open.map(function(p){return "• "+p.t;}).join("\n");
 }
 function fill(t){
-  var s=stats(),ms=monthStats();
+  var s=stats(),ms=monthStats(S.sel_month||currentIsoMonth());
   if($("fm")&&$("fm").value!==""){s.m=n($("fm").value)}
   if($("fv")&&$("fv").value!==""){s.v=n($("fv").value)}
   s.f=Math.max(0,s.m-s.v);
@@ -919,7 +1029,7 @@ function cp(k){
 }
 
 /* MAIS */
-function rMais(){$("m_cp").value=S.com;$("m_nt").value=S.note;rRank();ind();com();troco();rEstq();rCont();rMonthSummary();rHist()}
+function rMais(){$("m_cp").value=S.com;$("m_nt").value=S.note;rRank();ind();com();troco();rEstq();rCont();rHistFilterSelect();rMonthSummary();rHist()}
 function cpy(t,b){
   var o=b.textContent,ok=function(){b.textContent="✔️ Copiado!";setTimeout(function(){b.textContent=o},1800)};
   var fb=function(){var a=document.createElement("textarea");a.value=t;a.style.cssText="position:fixed;opacity:0";document.body.appendChild(a);a.select();try{document.execCommand("copy");ok()}catch(e){alert(t)}document.body.removeChild(a)};
@@ -973,44 +1083,138 @@ function rCont(){
     ?S.cont.map(function(c,i){return '<div class="row"><span class="grow">'+esc(c.n)+'<br><small class="tag">'+esc(c.t||"sem telefone")+'</small></span>'+(c.t?'<a href="tel:'+c.t+'"><button>📞</button></a><a href="https://wa.me/'+(c.t.length<=11?"55":"")+c.t+'" target="_blank" rel="noopener"><button class="s">💬</button></a>':"")+'<button class="x" onclick="S.cont.splice('+i+',1);save();rCont()">✕</button></div>';}).join("")
     :'<div class="empty">Ex: manutenção, fornecedor, shopping.</div>';
 }
+
+/* HISTÓRICO E FILTRO MENSAL */
+function getAvailableMonths(){
+  var set={};
+  set[currentIsoMonth()]=true;
+  if(S.sel_month)set[S.sel_month]=true;
+  Object.keys(S.months).forEach(function(k){if(k)set[k]=true;});
+  S.hist.forEach(function(h){
+    var k=h.month||brDateToIsoMonth(h.d);
+    if(k)set[k]=true;
+  });
+  return Object.keys(set).sort().reverse();
+}
+function rHistFilterSelect(){
+  var sel=$("histMonthFilter");if(!sel)return;
+  var months=getAvailableMonths();
+  var cur=S.hist_filter||S.sel_month||currentIsoMonth();
+  sel.innerHTML=
+    '<option value="ALL"'+(cur==="ALL"?' selected':'')+'>Todos os meses</option>'+
+    months.map(function(m){
+      return '<option value="'+esc(m)+'"'+(cur===m?' selected':'')+'>📅 '+esc(formatIsoMonthLabel(m))+'</option>';
+    }).join("");
+}
+function onFilterHistMonth(val){
+  S.hist_filter=val;
+  if(val!=="ALL"){
+    S.sel_month=val;
+    ensureMonthRecord(val);
+    if($("t0").classList.contains("on"))rMonth();
+  }
+  save();
+  rMonthSummary();
+  rHist();
+}
 function saveHist(){
   var s=stats();
   if(s.m<=0&&s.v<=0){$("hist").innerHTML='<div class="empty">Preencha meta e vendido na aba Metas primeiro.</div>';return;}
   var d=new Date().toLocaleDateString("pt-BR");
+  var targetIso=S.sel_month||currentIsoMonth();
+  var sellerSnap={};
+  S.sell.forEach(function(sl){
+    var vt=sellerTotal(sl.id);
+    if(vt>0)sellerSnap[sl.id]=vt;
+  });
   S.hist=S.hist.filter(function(x){return x.d!==d;});
-  S.hist.unshift({d:d,m:s.m,v:s.v});
-  S.hist=S.hist.slice(0,60);
-  save();rMonthSummary();rHist();
+  S.hist.unshift({d:d,m:s.m,v:s.v,month:targetIso,sellers:sellerSnap});
+  S.hist=S.hist.slice(0,180);
+  save();rHistFilterSelect();rMonthSummary();rHist();
+}
+function buildMonthReportText(iso){
+  var ms=monthStats(iso);
+  var items=S.hist.filter(function(h){return (h.month||brDateToIsoMonth(h.d))===iso;});
+  var hit=items.filter(function(x){return n(x.m)>0&&n(x.v)>=n(x.m);}).length;
+  var lines=[
+    "📊 Relatório Mensal — "+formatIsoMonthLabel(iso),
+    "Meta do mês: "+R(ms.mm),
+    "Acumulado vendido: "+R(ms.mv)+" ("+ms.pct.toFixed(1).replace(".",",")+"%)",
+    "Falta para meta: "+R(ms.mf),
+    "Dias fechados: "+items.length+" ("+hit+" meta(s) batida(s))"
+  ];
+  if(S.sell.length){
+    lines.push("","Equipe no mês:");
+    S.sell.forEach(function(sl){
+      lines.push("• "+sl.n+": "+R(sellerMonthTotal(sl.id,iso)));
+    });
+  }
+  if(items.length){
+    lines.push("","Fechamentos diários:");
+    items.slice().reverse().forEach(function(x){
+      var p=n(x.m)>0?(n(x.v)/n(x.m)*100).toFixed(0)+"%":"—";
+      lines.push("• "+x.d+": "+R(n(x.v))+" / Meta "+R(n(x.m))+" ("+p+")");
+    });
+  }
+  return lines.join("\n");
 }
 function rMonthSummary(){
   var el=$("monthSummaryBox");if(!el)return;
-  var groups={};
-  S.hist.forEach(function(item){
-    var parts=String(item.d||"").split("/");
-    var key=parts.length===3?(parts[1]+"/"+parts[2]):(S.m_ref||currentMonthKey());
-    if(!groups[key])groups[key]={sumV:0,days:0,hit:0};
-    groups[key].sumV+=n(item.v);
-    groups[key].days+=1;
-    if(n(item.m)>0&&n(item.v)>=n(item.m))groups[key].hit+=1;
-  });
-  var keys=Object.keys(groups);
-  if(!keys.length){el.innerHTML="";return;}
+  var filter=S.hist_filter||S.sel_month||currentIsoMonth();
+  if(filter==="ALL"){
+    var months=getAvailableMonths();
+    el.innerHTML=
+      '<h3>Consolidado por mês</h3>'+
+      months.map(function(mk){
+        var ms=monthStats(mk);
+        var items=S.hist.filter(function(h){return (h.month||brDateToIsoMonth(h.d))===mk;});
+        var sumH=items.reduce(function(a,b){return a+n(b.v);},0);
+        var totV=ms.mv>0?ms.mv:sumH;
+        var hit=items.filter(function(x){return n(x.m)>0&&n(x.v)>=n(x.m);}).length;
+        return '<div class="v-card" onclick="onFilterHistMonth(\''+mk+'\')" style="cursor:pointer">'+
+          '<div class="v-top"><span class="v-name">📅 '+esc(formatIsoMonthLabel(mk))+'</span><span class="v-tot">'+R(totV)+'</span></div>'+
+          '<div class="v-sub">Meta: '+(ms.mm>0?R(ms.mm):"não definida")+' · '+items.length+' fechamento(s) · Metas batidas: '+hit+'/'+items.length+'</div>'+
+        '</div>';
+      }).join("");
+    return;
+  }
+
+  var ms=monthStats(filter);
+  var items=S.hist.filter(function(h){return (h.month||brDateToIsoMonth(h.d))===filter;});
+  var sumH=items.reduce(function(a,b){return a+n(b.v);},0);
+  var displaySold=ms.mv>0?ms.mv:sumH;
+  var avg=items.length>0?(sumH/items.length):0;
+  var hit=items.filter(function(x){return n(x.m)>0&&n(x.v)>=n(x.m);}).length;
+
+  var teamHtml="";
+  if(S.sell.length){
+    teamHtml='<div style="margin-top:8px">'+S.sell.map(function(sl){
+      var v=sellerMonthTotal(sl.id,filter);
+      return '<div class="row" style="min-height:38px;padding:3px 0"><span class="grow">'+esc(sl.n)+'</span><b>'+R(v)+'</b></div>';
+    }).join("")+'</div>';
+  }
+
   el.innerHTML=
-    '<h3>Consolidado por mês</h3>'+
-    keys.map(function(k){
-      var g=groups[k];
-      var avg=g.days>0?g.sumV/g.days:0;
-      return '<div class="v-card">'+
-        '<div class="v-top"><span class="v-name">📅 '+esc(k)+'</span><span class="v-tot">'+R(g.sumV)+'</span></div>'+
-        '<div class="v-sub">'+g.days+' dia(s) salvo(s) · Média: '+R(avg)+'/dia · Metas batidas: '+g.hit+'/'+g.days+'</div>'+
-      '</div>';
-    }).join("");
+    '<h3>Resumo de '+esc(formatIsoMonthLabel(filter))+'</h3>'+
+    '<div class="v-card">'+
+      '<div class="v-top"><span class="v-name">📅 '+esc(formatIsoMonthLabel(filter))+'</span><span class="v-tot">'+R(displaySold)+'</span></div>'+
+      '<div class="v-sub">Meta: '+(ms.mm>0?R(ms.mm)+" ("+(displaySold/ms.mm*100).toFixed(1).replace(".",",")+"%)":"não definida")+' · Média/dia: '+R(avg)+' · Metas batidas: '+hit+'/'+items.length+'</div>'+
+      teamHtml+
+      '<button class="s w" style="margin-top:10px" onclick="cpy(buildMonthReportText(\''+filter+'\'),this)">📋 Copiar relatório de '+esc(formatIsoMonthLabel(filter))+'</button>'+
+    '</div>';
 }
 function rHist(){
-  var h=S.hist;
-  $("hist").innerHTML=h.length
-    ?h.map(function(x,i){var p=x.m>0?x.v/x.m*100:0;return '<div class="row"><span class="grow">'+x.d+'<br><small class="tag">'+R(x.v)+' de '+R(x.m)+'</small></span><b style="color:var(--'+(p>=100?"ok":"bad")+')">'+p.toFixed(0)+'%</b><button class="x" onclick="S.hist.splice('+i+',1);save();rMonthSummary();rHist()">✕</button></div>';}).join("")+'<div class="kpis"><div class="kpi"><small>Média vendida</small><b>'+R(h.reduce(function(c,x){return c+x.v;},0)/h.length)+'</b></div><div class="kpi"><small>Metas batidas</small><b>'+h.filter(function(x){return x.m>0&&x.v>=x.m;}).length+"/"+h.length+'</b></div></div>'
-    :'<div class="empty">Nenhum fechamento salvo ainda.</div>';
+  var filter=S.hist_filter||S.sel_month||currentIsoMonth();
+  var indexed=S.hist.map(function(x,idx){return{x:x,idx:idx};}).filter(function(item){
+    if(filter==="ALL")return true;
+    return (item.x.month||brDateToIsoMonth(item.x.d))===filter;
+  });
+  $("hist").innerHTML=indexed.length
+    ?'<h3>Fechamentos diários ('+indexed.length+')</h3>'+indexed.map(function(item){
+      var x=item.x,p=n(x.m)>0?n(x.v)/n(x.m)*100:0;
+      return '<div class="row"><span class="grow">'+esc(x.d)+'<br><small class="tag">'+R(n(x.v))+' de '+R(n(x.m))+'</small></span><b style="color:var(--'+(p>=100?"ok":"bad")+')">'+(n(x.m)>0?p.toFixed(0)+"%":"—")+'</b><button class="x" onclick="S.hist.splice('+item.idx+',1);save();rHistFilterSelect();rMonthSummary();rHist()">✕</button></div>';
+    }).join("")
+    :'<div class="empty">Nenhum fechamento salvo para '+esc(filter==="ALL"?"nenhum mês":formatIsoMonthLabel(filter))+'.</div>';
 }
 function bkDownload(){
   try{
@@ -1036,7 +1240,6 @@ function bkImp(){
 /* INIT */
 $("meta").value=S.meta;$("vend").value=S.vend;$("hrs").value=S.hrs;$("nv").value=S.nv;
 $("pa_meta").value=S.pa_meta||"";$("foco_dia").value=S.foco_dia||"";
-$("m_meta").value=S.m_meta||"";$("m_vend").value=S.m_vend||"";
 $("cv").value=S.calc.v;$("cd").value=S.calc.d;$("cp").value=S.calc.p;$("cj").value=S.calc.j;
 setTheme(S.theme);rMeta();rMonth();calc();rCheck();rPend();rTodayShift();rGrade();rSales();go(S.tab||0);
 </script>
