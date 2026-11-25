@@ -211,6 +211,22 @@ a{text-decoration:none;color:inherit}
   </div>
 
   <div class="card">
+    <h2>Controle mensal (<span id="monthLabel"></span>)</h2>
+    <div class="g2">
+      <label class="f">Meta mensal da loja (R$)<input id="m_meta" type="number" inputmode="decimal" step="any" placeholder="Ex: 65000" oninput="mmv()"></label>
+      <label class="f">Acumulado no mês (R$)<input id="m_vend" type="number" inputmode="decimal" step="any" placeholder="Ex: 32400" oninput="mmv()"></label>
+    </div>
+    <div class="bar" id="mbar"><i id="mbarf"></i></div>
+    <div id="mpct" style="font-weight:700"></div>
+    <div class="kpis" id="mkpis"></div>
+    <div class="g2" style="margin-top:10px">
+      <button onclick="closeDayToMonth()">✅ Fechar dia e somar no mês</button>
+      <button class="s" onclick="resetMonth()">↺ Zerar mês</button>
+    </div>
+    <div id="monthTeamSummary"></div>
+  </div>
+
+  <div class="card">
     <h2>Vendas por vendedora / vendedor</h2>
     <div id="saleForm"></div>
     <div id="sellersSalesList"></div>
@@ -261,14 +277,14 @@ a{text-decoration:none;color:inherit}
     <h2>Cadastrar equipe</h2>
     <div class="g2">
       <label class="f" style="margin:0">Nome<input id="sn" type="text" placeholder="Ex: Camila" style="margin-top:4px"></label>
-      <label class="f" style="margin:0">Meta individual (R$ opcional)<input id="sm" type="number" inputmode="decimal" step="any" placeholder="Ex: 2500" style="margin-top:4px"></label>
+      <label class="f" style="margin:0">Meta dia / mês (R$ opcional)<input id="sm" type="number" inputmode="decimal" step="any" placeholder="Ex: 2500" style="margin-top:4px"></label>
     </div>
     <button class="w" style="margin-top:10px" onclick="addSell()">+ Adicionar vendedor(a)</button>
   </div>
   <div class="card">
     <h2>Grade da semana</h2>
     <div class="scroll" id="grade"></div>
-    <div class="leg">Toque na célula para alternar: — → Manhã → Tarde → Integral → Folga → Férias. Toque no nome para editar meta ou remover.</div>
+    <div class="leg">Toque na célula para alternar: — → Manhã → Tarde → Integral → Folga → Férias. Toque no nome para editar metas ou remover.</div>
   </div>
 </section>
 
@@ -280,7 +296,7 @@ a{text-decoration:none;color:inherit}
       <label class="f">Meta (R$)<input id="fm" type="number" inputmode="decimal" step="any" placeholder="da aba Metas" oninput="fq()"></label>
       <label class="f">Vendido (R$)<input id="fv" type="number" inputmode="decimal" step="any" placeholder="da aba Metas" oninput="fq()"></label>
     </div>
-    <div class="leg">Variáveis: {data} {meta} {vendido} {falta} {pct} {indiv} {porhora} {status} {escala} {equipe_vendas} {foco} {pa} {pendencias} {reposicao}</div>
+    <div class="leg">Variáveis: {data} {meta} {vendido} {falta} {pct} {indiv} {porhora} {status} {escala} {equipe_vendas} {foco} {pa} {pendencias} {reposicao} {meta_mes} {vendido_mes} {falta_mes} {pct_mes}</div>
   </div>
   <div id="msgs"></div>
 </section>
@@ -327,8 +343,9 @@ a{text-decoration:none;color:inherit}
     </div>
     <div id="cont"></div>
   </details>
-  <details class="card"><summary>🗓️ Histórico de fechamentos</summary>
+  <details class="card" open><summary>🗓️ Histórico e resumo mensal</summary>
     <button class="w" onclick="saveHist()">💾 Salvar fechamento de hoje</button>
+    <div id="monthSummaryBox"></div>
     <div id="hist"></div>
   </details>
   <details class="card"><summary>📝 Bloco de notas</summary>
@@ -349,13 +366,15 @@ a{text-decoration:none;color:inherit}
 <script>
 var DIAS=["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"],OPT=["","M","T","I","F","V"],LAB=["—","Manhã","Tarde","Integral","Folga","Férias"];
 var TPL={
-  bom:{n:"☀️ Bom dia e Meta do Dia",t:"☀️ Bom dia, equipe!\n\nHoje ({data}) nossa meta na loja é {meta}.\nMeta base por pessoa: {indiv} | Meta PA: {pa}.\nFoco do dia: {foco}\n\nVamos com experimentação no balcão, kits presente e encantamento! ❤️"},
-  par:{n:"📊 Parcial do Dia",t:"📊 Parcial do dia ({data})\n\nVendido até agora: {vendido}\nMeta do dia: {meta} ({pct})\nFalta: {falta}\n\n{equipe_vendas}\n\nRitmo necessário: {porhora}/h até o fechamento. Foco em {foco}! 🔥"},
-  fec:{n:"🌙 Fechamento e Repasse do Dia",t:"🌙 Fechamento do dia ({data})\n\nMeta: {meta}\nVendido: {vendido} ({pct})\n{status}\n\n{equipe_vendas}\n\nPendências abertas:\n{pendencias}\n\nReposição / Estoque:\n{reposicao}\n\nParabéns pelo trabalho de hoje, equipe! ❤️"},
+  bom:{n:"☀️ Bom dia e Meta do Dia",t:"☀️ Bom dia, equipe!\n\nHoje ({data}) nossa meta na loja é {meta}.\nMeta base por pessoa: {indiv} | Meta PA: {pa}.\nAcumulado do mês: {vendido_mes} de {meta_mes} ({pct_mes}).\nFoco do dia: {foco}\n\nVamos com experimentação no balcão, kits presente e encantamento! ❤️"},
+  par:{n:"📊 Parcial do Dia",t:"📊 Parcial do dia ({data})\n\nVendido até agora: {vendido}\nMeta do dia: {meta} ({pct})\nFalta hoje: {falta} | Falta no mês: {falta_mes}\n\n{equipe_vendas}\n\nRitmo necessário: {porhora}/h até o fechamento. Foco em {foco}! 🔥"},
+  fec:{n:"🌙 Fechamento e Repasse do Dia",t:"🌙 Fechamento do dia ({data})\n\nMeta do dia: {meta}\nVendido hoje: {vendido} ({pct})\n{status}\nMês ({pct_mes}): {vendido_mes} de {meta_mes} (falta {falta_mes})\n\n{equipe_vendas}\n\nPendências abertas:\n{pendencias}\n\nReposição / Estoque:\n{reposicao}\n\nParabéns pelo trabalho de hoje, equipe! ❤️"},
   esc:{n:"📅 Aviso de Escala",t:"📅 Aviso de escala da semana\n\n{escala}\n\nQualquer troca, falar comigo com antecedência. Obrigada!"}
 };
 var DEF={
-  theme:"light",meta:"",vend:"",hrs:"",nv:"",pa_meta:"",foco_dia:"",calc:{v:"",d:"",p:"",j:""},edit:false,
+  theme:"light",meta:"",vend:"",hrs:"",nv:"",pa_meta:"",foco_dia:"",
+  m_meta:"",m_vend:"",m_ref:"",m_sell_vend:{},
+  calc:{v:"",d:"",p:"",j:""},edit:false,
   chk:{
     Abertura:["Ligar luzes, som e ar-condicionado","Conferir caixa e troco","Verificar vitrines, provadores e preços","Alinhar meta e destaques do dia com a equipe","Checar limpeza e aromatização da loja"],
     Turno:["Acompanhar parcial da meta e vendas da equipe","Fazer reposição de estoque e testadores","Revisar atendimento e abordagem no salão","Responder clientes no WhatsApp","Conferir pausas e horários da equipe"],
@@ -363,26 +382,36 @@ var DEF={
   },
   done:{},pend:[],sell:[],esc:{},sales:[],msgs:{},fm:"",fv:"",tab:0,rank:{},com:"",estq:[],cont:[],hist:[],note:""
 };
-var S=JSON.parse(JSON.stringify(DEF));
+function currentMonthKey(){
+  var d=new Date();
+  var m=String(d.getMonth()+1).padStart(2,"0");
+  return m+"/"+d.getFullYear();
+}
 function normalizeState(obj){
   var base=JSON.parse(JSON.stringify(DEF));
   if(obj&&typeof obj==="object"){
     for(var k in obj)if(obj[k]!==undefined)base[k]=obj[k];
   }
   if(!Array.isArray(base.sell))base.sell=[];
+  base.sell.forEach(function(s){
+    if(s.mGoal===undefined)s.mGoal="";
+  });
   if(!Array.isArray(base.sales))base.sales=[];
   if(!Array.isArray(base.pend))base.pend=[];
   if(!Array.isArray(base.estq))base.estq=[];
   if(!Array.isArray(base.cont))base.cont=[];
   if(!Array.isArray(base.hist))base.hist=[];
   if(!base.rank||typeof base.rank!=="object")base.rank={};
+  if(!base.m_sell_vend||typeof base.m_sell_vend!=="object")base.m_sell_vend={};
   if(!base.esc||typeof base.esc!=="object")base.esc={};
   if(!base.msgs||typeof base.msgs!=="object")base.msgs={};
   if(!base.calc||typeof base.calc!=="object")base.calc={v:"",d:"",p:"",j:""};
   if(!base.chk||typeof base.chk!=="object")base.chk=JSON.parse(JSON.stringify(DEF.chk));
   if(!base.done||typeof base.done!=="object")base.done={};
+  if(!base.m_ref)base.m_ref=currentMonthKey();
   return base;
 }
+var S=normalizeState(null);
 try{
   var raw=localStorage.getItem("ag_v1");
   if(raw)S=normalizeState(JSON.parse(raw));
@@ -410,7 +439,7 @@ function go(i){
   $("nav").innerHTML=NAV.map(function(x,j){
     return '<button class="'+(j===i?"on":"")+'" onclick="go('+j+')"><b>'+x[0]+'</b>'+x[1]+'</button>';
   }).join("");
-  if(i===0){rSales();}
+  if(i===0){rMonth();rSales();}
   if(i===2){rTodayShift();rGrade();}
   if(i===3){rMsgs();}
   if(i===4){rMais();}
@@ -422,6 +451,9 @@ function sellerTotal(id){
   var fromLogs=S.sales.filter(function(x){return x.sid===id;}).reduce(function(acc,x){return acc+n(x.val);},0);
   var manual=n(S.rank[id]);
   return Math.max(fromLogs,manual);
+}
+function sellerMonthTotal(id){
+  return n(S.m_sell_vend[id]);
 }
 function teamSalesTotal(){
   var seen={};
@@ -437,9 +469,11 @@ function teamSalesTotal(){
 }
 function teamSalesSummaryText(){
   if(!S.sell.length)return"Equipe: sem vendedores cadastrados.";
-  return "Vendas da equipe:\n"+S.sell.map(function(s){
-    var t=sellerTotal(s.id),m=n(s.goal);
-    return "• "+s.n+": "+R(t)+(m>0?" ("+(t/m*100).toFixed(0)+"% da meta de "+R(m)+")":"");
+  return "Vendas da equipe (dia / mês):\n"+S.sell.map(function(s){
+    var t=sellerTotal(s.id),m=n(s.goal),mt=sellerMonthTotal(s.id),mg=n(s.mGoal);
+    var dayStr=R(t)+(m>0?" ("+(t/m*100).toFixed(0)+"% meta dia)":"");
+    var monStr="Mês: "+R(mt)+(mg>0?" ("+(mt/mg*100).toFixed(0)+"% meta mês)":"");
+    return "• "+s.n+": "+dayStr+" | "+monStr;
   }).join("\n");
 }
 function addSale(){
@@ -528,7 +562,7 @@ function rSales(){
   var med=["🥇","🥈","🥉"];
 
   listEl.innerHTML=
-    '<h3>Total por vendedor ('+R(totTeam)+')</h3>'+
+    '<h3>Total do dia por vendedor ('+R(totTeam)+')</h3>'+
     sorted.map(function(s,idx){
       var v=sellerTotal(s.id);
       var g=n(s.goal);
@@ -536,8 +570,8 @@ function rSales(){
       var share=totTeam>0?(v/totTeam*100):0;
       var badge=v>0?(med[idx]||(idx+1)+"º"):"•";
       var sub=g>0
-        ? "Meta: "+R(g)+" ("+(v/g*100).toFixed(0)+"%) · Falta: "+R(Math.max(0,g-v))+" · "+share.toFixed(0)+"% da loja"
-        : share.toFixed(0)+"% do total da equipe";
+        ? "Meta dia: "+R(g)+" ("+(v/g*100).toFixed(0)+"%) · Falta: "+R(Math.max(0,g-v))+" · "+share.toFixed(0)+"% do dia"
+        : share.toFixed(0)+"% do total do dia";
       return '<div class="v-card">'+
         '<div class="v-top"><span class="v-name">'+badge+' '+esc(s.n)+'</span><span class="v-tot">'+R(v)+'</span></div>'+
         '<div class="v-sub">'+sub+'</div>'+
@@ -564,6 +598,108 @@ function rSales(){
         '<b>'+R(n(item.val))+'</b>'+
         '<button class="ed" onclick="editSale(\''+item.id+'\')" title="Editar lançamento">✏️</button>'+
         '<button class="x" onclick="delSale(\''+item.id+'\')" title="Remover lançamento">✕</button>'+
+      '</div>';
+    }).join("");
+}
+
+/* CONTROLE MENSAL */
+function monthStats(){
+  var mm=n(S.m_meta),mv=n(S.m_vend),mf=Math.max(0,mm-mv);
+  var now=new Date();
+  var totalDays=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
+  var remDays=Math.max(1,totalDays-now.getDate()+1);
+  return{
+    mm:mm,mv:mv,mf:mf,
+    pct:mm>0?Math.min(100,mv/mm*100):0,
+    dailyNeed:mf/remDays,
+    remDays:remDays
+  };
+}
+function mmv(){
+  S.m_meta=$("m_meta").value;
+  S.m_vend=$("m_vend").value;
+  S.m_ref=currentMonthKey();
+  save();rMonth();
+}
+function closeDayToMonth(){
+  var s=stats();
+  var dayVal=s.v>0?s.v:teamSalesTotal();
+  if(dayVal<=0){alert("Informe ou registre o vendido do dia antes de fechar.");return;}
+  if(!confirm("Salvar fechamento de hoje ("+R(dayVal)+") no histórico e somar no acumulado do mês?"))return;
+  var d=new Date().toLocaleDateString("pt-BR");
+  var prevEntry=S.hist.find(function(x){return x.d===d;});
+  var prevVal=prevEntry?n(prevEntry.v):0;
+  var diff=dayVal-prevVal;
+  S.m_vend=String(Math.max(0,n(S.m_vend)+diff));
+  S.m_ref=currentMonthKey();
+  S.sell.forEach(function(sl){
+    var vToday=sellerTotal(sl.id);
+    if(vToday>0){
+      S.m_sell_vend[sl.id]=String(n(S.m_sell_vend[sl.id])+vToday);
+    }
+  });
+  var mGoal=s.m>0?s.m:(prevEntry?n(prevEntry.m):0);
+  S.hist=S.hist.filter(function(x){return x.d!==d;});
+  S.hist.unshift({d:d,m:mGoal,v:dayVal});
+  S.hist=S.hist.slice(0,60);
+  if($("m_vend"))$("m_vend").value=S.m_vend;
+  save();
+  rMonth();
+  rSales();
+  if($("t4").classList.contains("on")){rMais();}
+  alert("Fechamento salvo e acumulado mensal atualizado!");
+}
+function resetMonth(){
+  if(!confirm("Zerar o acumulado mensal da loja e dos vendedores para este mês?"))return;
+  S.m_vend="";
+  S.m_sell_vend={};
+  S.m_ref=currentMonthKey();
+  if($("m_vend"))$("m_vend").value="";
+  save();
+  rMonth();
+}
+function editSellerMonth(id){
+  var sl=S.sell.find(function(x){return x.id===id;});
+  if(!sl)return;
+  var cur=sellerMonthTotal(id);
+  var res=prompt("Acumulado mensal de "+sl.n+" (R$):",cur>0?String(cur).replace(".",","):"0");
+  if(res===null)return;
+  var val=n(res);
+  S.m_sell_vend[id]=val>0?String(val):"";
+  save();rMonth();
+}
+function rMonth(){
+  if(!$("m_meta")||!$("m_vend"))return;
+  if($("monthLabel"))$("monthLabel").textContent=S.m_ref||currentMonthKey();
+  var ms=monthStats();
+  $("mbarf").style.width=ms.pct+"%";
+  $("mbar").classList.toggle("ok",ms.mm>0&&ms.mf===0);
+  $("mpct").textContent=ms.mm>0
+    ?(ms.mf===0?"🎉 Meta mensal batida! ":"")+ms.pct.toFixed(1).replace(".",",")+"% da meta mensal"
+    :"Informe a meta mensal da loja para acompanhar";
+  var k=function(l,v,w){return '<div class="kpi'+(w?" wide":"")+'"><small>'+l+'</small><b>'+v+'</b></div>';};
+  $("mkpis").innerHTML=
+    k("Falta no mês",R(ms.mf),1)+
+    k("Ritmo médio / dia ("+ms.remDays+"d)",ms.mm>0?R(ms.dailyNeed):"—")+
+    k("Meta mensal",ms.mm>0?R(ms.mm):"—")+
+    k("Acumulado mês",R(ms.mv));
+
+  var teamBox=$("monthTeamSummary");
+  if(!teamBox)return;
+  if(!S.sell.length){
+    teamBox.innerHTML="";
+    return;
+  }
+  teamBox.innerHTML=
+    '<h3>Acumulado mensal por vendedor</h3>'+
+    S.sell.map(function(s){
+      var mt=sellerMonthTotal(s.id);
+      var mg=n(s.mGoal);
+      var pct=mg>0?Math.min(100,mt/mg*100):0;
+      return '<div class="v-card" onclick="editSellerMonth(\''+s.id+'\')" style="cursor:pointer">'+
+        '<div class="v-top"><span class="v-name">'+esc(s.n)+'</span><span class="v-tot">'+R(mt)+'</span></div>'+
+        '<div class="v-sub">'+(mg>0?"Meta mês: "+R(mg)+" ("+(mt/mg*100).toFixed(0)+"%) · Falta: "+R(Math.max(0,mg-mt)):"Toque para ajustar acumulado mensal")+'</div>'+
+        (mg>0?'<div class="v-bar '+(mt>=mg?"ok":"")+'"><i style="width:'+pct+'%"></i></div>':"")+
       '</div>';
     }).join("");
 }
@@ -673,20 +809,18 @@ function addSell(){
   var g=$("sm")?$("sm").value:"";
   if(!v)return;
   var id=uid();
-  S.sell.push({id:id,n:v,goal:g});
+  S.sell.push({id:id,n:v,goal:g,mGoal:""});
   S.esc[id]=[0,0,0,0,0,0,0];
   $("sn").value="";
   if($("sm"))$("sm").value="";
   save();
-  rTodayShift();
-  rGrade();
-  rSales();
+  rTodayShift();rGrade();rSales();rMonth();
 }
 function cyc(id,d){var a=S.esc[id];a[d]=(a[d]+1)%6;save();rTodayShift();rGrade()}
 function editOrRemoveSell(i){
   var s=S.sell[i];if(!s)return;
   var escolha=prompt(
-    s.n+" — Digite a nova meta individual em R$ (ou deixe em branco para sem meta),\nOU digite REMOVER para excluir este vendedor:",
+    s.n+" — Digite a meta DIÁRIA em R$ (ou deixe em branco),\nOU digite REMOVER para excluir este vendedor:",
     s.goal||""
   );
   if(escolha===null)return;
@@ -694,14 +828,17 @@ function editOrRemoveSell(i){
     if(confirm("Remover "+s.n+" da equipe?")){
       delete S.esc[s.id];
       delete S.rank[s.id];
+      delete S.m_sell_vend[s.id];
       S.sales=S.sales.filter(function(x){return x.sid!==s.id;});
       S.sell.splice(i,1);
-      save();rTodayShift();rGrade();rSales();
+      save();rTodayShift();rGrade();rSales();rMonth();
     }
     return;
   }
   s.goal=escolha.trim();
-  save();rGrade();rSales();
+  var mGoalRes=prompt("Meta MENSAL individual de "+s.n+" em R$ (opcional):",s.mGoal||"");
+  if(mGoalRes!==null)s.mGoal=mGoalRes.trim();
+  save();rGrade();rSales();rMonth();
 }
 function rGrade(){
   if(!S.sell.length){$("grade").innerHTML='<div class="empty">Cadastre os vendedores acima.</div>';return;}
@@ -739,7 +876,7 @@ function stockSummaryText(){
   return open.map(function(p){return "• "+p.t;}).join("\n");
 }
 function fill(t){
-  var s=stats();
+  var s=stats(),ms=monthStats();
   if($("fm")&&$("fm").value!==""){s.m=n($("fm").value)}
   if($("fv")&&$("fv").value!==""){s.v=n($("fv").value)}
   s.f=Math.max(0,s.m-s.v);
@@ -757,7 +894,11 @@ function fill(t){
     foco:(S.foco_dia||"").trim()||"Encantamento e venda adicional",
     pa:(S.pa_meta||"").trim()||"—",
     pendencias:pendingSummaryText(),
-    reposicao:stockSummaryText()
+    reposicao:stockSummaryText(),
+    meta_mes:R(ms.mm),
+    vendido_mes:R(ms.mv),
+    falta_mes:R(ms.mf),
+    pct_mes:ms.pct.toFixed(1).replace(".",",")+"%"
   };
   return t.replace(/\{(\w+)\}/g,function(a,k){return k in V?V[k]:a});
 }
@@ -778,7 +919,7 @@ function cp(k){
 }
 
 /* MAIS */
-function rMais(){$("m_cp").value=S.com;$("m_nt").value=S.note;rRank();ind();com();troco();rEstq();rCont();rHist()}
+function rMais(){$("m_cp").value=S.com;$("m_nt").value=S.note;rRank();ind();com();troco();rEstq();rCont();rMonthSummary();rHist()}
 function cpy(t,b){
   var o=b.textContent,ok=function(){b.textContent="✔️ Copiado!";setTimeout(function(){b.textContent=o},1800)};
   var fb=function(){var a=document.createElement("textarea");a.value=t;a.style.cssText="position:fixed;opacity:0";document.body.appendChild(a);a.select();try{document.execCommand("copy");ok()}catch(e){alert(t)}document.body.removeChild(a)};
@@ -838,13 +979,37 @@ function saveHist(){
   var d=new Date().toLocaleDateString("pt-BR");
   S.hist=S.hist.filter(function(x){return x.d!==d;});
   S.hist.unshift({d:d,m:s.m,v:s.v});
-  S.hist=S.hist.slice(0,30);
-  save();rHist();
+  S.hist=S.hist.slice(0,60);
+  save();rMonthSummary();rHist();
+}
+function rMonthSummary(){
+  var el=$("monthSummaryBox");if(!el)return;
+  var groups={};
+  S.hist.forEach(function(item){
+    var parts=String(item.d||"").split("/");
+    var key=parts.length===3?(parts[1]+"/"+parts[2]):(S.m_ref||currentMonthKey());
+    if(!groups[key])groups[key]={sumV:0,days:0,hit:0};
+    groups[key].sumV+=n(item.v);
+    groups[key].days+=1;
+    if(n(item.m)>0&&n(item.v)>=n(item.m))groups[key].hit+=1;
+  });
+  var keys=Object.keys(groups);
+  if(!keys.length){el.innerHTML="";return;}
+  el.innerHTML=
+    '<h3>Consolidado por mês</h3>'+
+    keys.map(function(k){
+      var g=groups[k];
+      var avg=g.days>0?g.sumV/g.days:0;
+      return '<div class="v-card">'+
+        '<div class="v-top"><span class="v-name">📅 '+esc(k)+'</span><span class="v-tot">'+R(g.sumV)+'</span></div>'+
+        '<div class="v-sub">'+g.days+' dia(s) salvo(s) · Média: '+R(avg)+'/dia · Metas batidas: '+g.hit+'/'+g.days+'</div>'+
+      '</div>';
+    }).join("");
 }
 function rHist(){
   var h=S.hist;
   $("hist").innerHTML=h.length
-    ?h.map(function(x,i){var p=x.m>0?x.v/x.m*100:0;return '<div class="row"><span class="grow">'+x.d+'<br><small class="tag">'+R(x.v)+' de '+R(x.m)+'</small></span><b style="color:var(--'+(p>=100?"ok":"bad")+')">'+p.toFixed(0)+'%</b><button class="x" onclick="S.hist.splice('+i+',1);save();rHist()">✕</button></div>';}).join("")+'<div class="kpis"><div class="kpi"><small>Média vendida</small><b>'+R(h.reduce(function(c,x){return c+x.v;},0)/h.length)+'</b></div><div class="kpi"><small>Metas batidas</small><b>'+h.filter(function(x){return x.m>0&&x.v>=x.m;}).length+"/"+h.length+'</b></div></div>'
+    ?h.map(function(x,i){var p=x.m>0?x.v/x.m*100:0;return '<div class="row"><span class="grow">'+x.d+'<br><small class="tag">'+R(x.v)+' de '+R(x.m)+'</small></span><b style="color:var(--'+(p>=100?"ok":"bad")+')">'+p.toFixed(0)+'%</b><button class="x" onclick="S.hist.splice('+i+',1);save();rMonthSummary();rHist()">✕</button></div>';}).join("")+'<div class="kpis"><div class="kpi"><small>Média vendida</small><b>'+R(h.reduce(function(c,x){return c+x.v;},0)/h.length)+'</b></div><div class="kpi"><small>Metas batidas</small><b>'+h.filter(function(x){return x.m>0&&x.v>=x.m;}).length+"/"+h.length+'</b></div></div>'
     :'<div class="empty">Nenhum fechamento salvo ainda.</div>';
 }
 function bkDownload(){
@@ -871,8 +1036,9 @@ function bkImp(){
 /* INIT */
 $("meta").value=S.meta;$("vend").value=S.vend;$("hrs").value=S.hrs;$("nv").value=S.nv;
 $("pa_meta").value=S.pa_meta||"";$("foco_dia").value=S.foco_dia||"";
+$("m_meta").value=S.m_meta||"";$("m_vend").value=S.m_vend||"";
 $("cv").value=S.calc.v;$("cd").value=S.calc.d;$("cp").value=S.calc.p;$("cj").value=S.calc.j;
-setTheme(S.theme);rMeta();calc();rCheck();rPend();rTodayShift();rGrade();rSales();go(S.tab||0);
+setTheme(S.theme);rMeta();rMonth();calc();rCheck();rPend();rTodayShift();rGrade();rSales();go(S.tab||0);
 </script>
 </body>
 </html>
