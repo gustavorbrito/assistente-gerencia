@@ -3,136 +3,313 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Assistente de Gerência Da Bia </title>
+<title>Assistente da Bia — L'Occitane au Brésil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f2f4f8;--card:#fff;--tx:#14181f;--mut:#667085;--ac:#2563eb;--act:#fff;--ok:#16a34a;--bad:#dc2626;--bd:#dde2ea;--inp:#f6f8fb;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1116;--card:#181d26;--tx:#eef1f6;--mut:#98a2b3;--ac:#4f8cff;--act:#07101f;--ok:#34d27b;--bad:#ff6b6b;--bd:#283040;--inp:#10141b;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0e1116;--card:#181d26;--tx:#eef1f6;--mut:#98a2b3;--ac:#4f8cff;--act:#07101f;--ok:#34d27b;--bad:#ff6b6b;--bd:#283040;--inp:#10141b;color-scheme:dark}
+:root{
+  --bg:#fdf8ee;--card:#fffdf9;--tx:#2a1f18;--mut:#736355;
+  --ac:#d99b00;--act:#1f160c;--ok:#3d6b47;--bad:#c63b32;
+  --bd:#e8dec6;--inp:#f5efe0;--bot:#4f6d48;
+  color-scheme:light;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#16120f;--card:#221c17;--tx:#f6efe3;--mut:#b5a694;
+    --ac:#eab308;--act:#191209;--ok:#5fa36d;--bad:#ff766b;
+    --bd:#3a2f26;--inp:#1b1612;--bot:#7fa374;
+    color-scheme:dark
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16120f;--card:#221c17;--tx:#f6efe3;--mut:#b5a694;
+  --ac:#eab308;--act:#191209;--ok:#5fa36d;--bad:#ff766b;
+  --bd:#3a2f26;--inp:#1b1612;--bot:#7fa374;
+  color-scheme:dark
+}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:96px}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
-header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--bd)}
-header h1{font-size:19px;margin:0}
+body{
+  margin:0;background:var(--bg);color:var(--tx);
+  font:16px/1.45 "Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  padding-bottom:98px
+}
+body::before{
+  content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);
+  background:var(--bg);z-index:10
+}
+header{
+  position:sticky;top:env(safe-area-inset-top,0px);z-index:5;
+  background:var(--card);display:flex;align-items:center;justify-content:space-between;
+  gap:12px;padding:12px 16px;border-bottom:1px solid var(--bd)
+}
+.brand h1{
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-size:24px;font-weight:700;line-height:1.05;margin:0;letter-spacing:.01em
+}
+.brand small{
+  display:block;font-size:11px;font-weight:600;color:var(--bot);
+  letter-spacing:.06em;text-transform:uppercase;margin-top:2px
+}
 main{max-width:640px;margin:0 auto;padding:14px}
 .tab{display:none}.tab.on{display:block}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px;margin-bottom:14px}
-h2{font-size:17px;margin:0 0 10px}h3{font-size:14px;margin:14px 0 6px;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+.card{
+  background:var(--card);border:1px solid var(--bd);border-radius:18px;
+  padding:15px;margin-bottom:14px;box-shadow:0 2px 10px rgba(42,31,24,.04)
+}
+h2{
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-size:22px;font-weight:700;line-height:1.15;margin:0 0 10px
+}
+h3{
+  font-size:12px;font-weight:700;margin:14px 0 6px;color:var(--mut);
+  text-transform:uppercase;letter-spacing:.06em
+}
 label.f{display:block;font-size:13px;color:var(--mut);margin-bottom:10px}
-input,select,textarea{width:100%;font:inherit;color:var(--tx);background:var(--inp);border:1px solid var(--bd);border-radius:12px;padding:13px;margin-top:4px;min-height:48px}
+input,select,textarea{
+  width:100%;font:inherit;color:var(--tx);background:var(--inp);
+  border:1px solid var(--bd);border-radius:12px;padding:12px 13px;
+  margin-top:4px;min-height:48px
+}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--ac);outline-offset:1px}
 textarea{min-height:120px;resize:vertical}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-button{font:inherit;font-weight:600;border:0;border-radius:12px;min-height:48px;padding:0 16px;background:var(--ac);color:var(--act);cursor:pointer}
+button{
+  font:inherit;font-weight:600;border:0;border-radius:12px;min-height:48px;
+  padding:0 16px;background:var(--ac);color:var(--act);cursor:pointer
+}
 button.s{background:var(--inp);color:var(--tx);border:1px solid var(--bd)}
-button.w{width:100%}button.x{min-width:48px;padding:0;background:transparent;color:var(--bad);font-size:20px}
-.bar{height:18px;background:var(--inp);border:1px solid var(--bd);border-radius:99px;overflow:hidden;margin:6px 0 4px}
+button.w{width:100%}
+button.x{min-width:44px;min-height:44px;padding:0;background:transparent;color:var(--bad);font-size:18px}
+.bar{height:18px;background:var(--inp);border:1px solid var(--bd);border-radius:99px;overflow:hidden;margin:8px 0 4px}
 .bar i{display:block;height:100%;width:0;background:var(--ac);transition:width .3s}
 .bar.ok i{background:var(--ok)}
 .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.kpi{background:var(--inp);border:1px solid var(--bd);border-radius:12px;padding:10px}
-.kpi small{color:var(--mut);display:block;font-size:12px}.kpi b{font-size:18px}
+.kpi{background:var(--inp);border:1px solid var(--bd);border-radius:12px;padding:10px 12px}
+.kpi small{color:var(--mut);display:block;font-size:12px}
+.kpi b{font-size:17px}
 .kpi.wide{grid-column:span 2}
-.row{display:flex;align-items:center;gap:10px;min-height:52px;border-bottom:1px solid var(--bd)}
+.row{
+  display:flex;align-items:center;gap:10px;min-height:52px;
+  border-bottom:1px solid var(--bd);padding:6px 0
+}
 .row:last-child{border-bottom:0}
-.row input[type=checkbox]{width:26px;height:26px;min-height:0;margin:0;flex:none;accent-color:var(--ac)}
-.row span{flex:1}.done{text-decoration:line-through;color:var(--mut)}
-.row input[type=text],.row input:not([type]){margin:0}
-.tag{font-size:11px;background:var(--inp);border:1px solid var(--bd);border-radius:99px;padding:2px 8px;color:var(--mut)}
+.row input[type=checkbox]{width:24px;height:24px;min-height:0;margin:0;flex:none;accent-color:var(--ac)}
+.row .grow{flex:1;min-width:0}
+.done{text-decoration:line-through;color:var(--mut)}
+.row input[type=text],.row input[type=number],.row input:not([type]){margin:0}
+.tag{
+  display:inline-block;font-size:11px;background:var(--inp);border:1px solid var(--bd);
+  border-radius:99px;padding:2px 8px;color:var(--mut)
+}
+.pill-ok{
+  display:inline-block;font-size:11px;font-weight:600;border-radius:99px;
+  padding:2px 8px;background:color-mix(in srgb,var(--ok) 15%,transparent);color:var(--ok)
+}
+.v-card{
+  background:var(--inp);border:1px solid var(--bd);border-radius:14px;
+  padding:11px 12px;margin-top:8px
+}
+.v-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.v-name{font-weight:700;font-size:15px}
+.v-tot{font-weight:700;font-size:15px;color:var(--ac)}
+.v-sub{font-size:12px;color:var(--mut);margin-top:2px}
+.v-bar{height:8px;background:var(--card);border:1px solid var(--bd);border-radius:99px;overflow:hidden;margin-top:6px}
+.v-bar i{display:block;height:100%;background:var(--bot);transition:width .3s}
+.v-bar.ok i{background:var(--ok)}
+.sale-item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0;border-bottom:1px dashed var(--bd);font-size:13px}
+.sale-item:last-child{border-bottom:0}
 .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
 table{border-collapse:separate;border-spacing:4px;width:100%}
 th{font-size:12px;color:var(--mut);font-weight:600}
-td.n{font-weight:600;font-size:14px;white-space:nowrap;min-width:84px}
-td button{min-height:46px;min-width:50px;width:100%;padding:0 4px;font-size:12px;background:var(--inp);color:var(--mut);border:1px solid var(--bd)}
+td.n{font-weight:600;font-size:14px;white-space:nowrap;min-width:84px;cursor:pointer}
+td button{
+  min-height:46px;min-width:50px;width:100%;padding:0 4px;font-size:12px;
+  background:var(--inp);color:var(--mut);border:1px solid var(--bd)
+}
 td button.M,td button.T,td button.I{background:var(--ac);color:var(--act);border-color:var(--ac)}
-td button.F{background:var(--inp);color:var(--bad)}td button.V{color:var(--ok)}
+td button.F{background:var(--inp);color:var(--bad)}
+td button.V{color:var(--ok)}
 tfoot td{text-align:center;font-weight:700;font-size:15px;color:var(--ok)}
 .leg{font-size:12px;color:var(--mut);margin-top:8px}
-.prev{white-space:pre-wrap;background:var(--inp);border:1px solid var(--bd);border-radius:12px;padding:12px;margin:10px 0;font-size:14px}
-nav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;background:var(--card);border-top:1px solid var(--bd);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
-nav button{flex:1;background:transparent;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;min-height:56px;padding:0}
-nav button b{font-size:22px;line-height:1}
+.prev{
+  white-space:pre-wrap;background:var(--inp);border:1px solid var(--bd);
+  border-radius:12px;padding:12px;margin:10px 0;font-size:14px
+}
+nav{
+  position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;
+  background:var(--card);border-top:1px solid var(--bd);
+  padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))
+}
+nav button{
+  flex:1;background:transparent;color:var(--mut);display:flex;
+  flex-direction:column;align-items:center;gap:2px;font-size:12px;
+  min-height:56px;padding:0;border-radius:10px
+}
+nav button b{font-size:20px;line-height:1}
 nav button.on{color:var(--ac);background:var(--inp)}
 .empty{color:var(--mut);font-size:14px;padding:8px 0}
-details>summary{font-weight:700;font-size:17px;min-height:44px;display:flex;align-items:center;cursor:pointer}
+details>summary{
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-weight:700;font-size:20px;min-height:44px;
+  display:flex;align-items:center;cursor:pointer
+}
 details>summary+*{margin-top:8px}
 a{text-decoration:none;color:inherit}
 </style>
 </head>
 <body>
-<header><h1>📋 Assistente de Gerência</h1><button class="s" id="th" onclick="toggleTheme()" aria-label="Alternar tema">🌙</button></header>
+<header>
+  <div class="brand">
+    <h1>🌿 Assistente da Bia</h1>
+    <small>L'Occitane au Brésil · Gestão de Loja</small>
+  </div>
+  <button class="s" id="th" onclick="toggleTheme()" aria-label="Alternar tema">🌙</button>
+</header>
+
 <main>
+<!-- ABA 0: METAS & VENDAS -->
 <section class="tab on" id="t0">
- <div class="card"><h2>Meta do dia</h2>
-  <div class="g2">
-   <label class="f">Meta do dia (R$)<input id="meta" type="number" inputmode="decimal" step="any" oninput="mv()"></label>
-   <label class="f">Vendido até agora (R$)<input id="vend" type="number" inputmode="decimal" step="any" oninput="mv()"></label>
-   <label class="f">Horas restantes<input id="hrs" type="number" inputmode="decimal" step="any" oninput="mv()"></label>
-   <label class="f">Vendedores no turno<input id="nv" type="number" inputmode="numeric" oninput="mv()"></label>
+  <div class="card">
+    <h2>Meta do dia</h2>
+    <div class="g2">
+      <label class="f">Meta do dia (R$)<input id="meta" type="number" inputmode="decimal" step="any" oninput="mv()"></label>
+      <label class="f">Vendido até agora (R$)<input id="vend" type="number" inputmode="decimal" step="any" oninput="mv()"></label>
+      <label class="f">Horas restantes<input id="hrs" type="number" inputmode="decimal" step="any" oninput="mv()"></label>
+      <label class="f">Vendedores no turno<input id="nv" type="number" inputmode="numeric" oninput="mv()"></label>
+    </div>
+    <div class="bar" id="bar"><i id="barf"></i></div>
+    <div id="pct" style="font-weight:700"></div>
+    <div class="kpis" id="kpis"></div>
   </div>
-  <div class="bar" id="bar"><i id="barf"></i></div>
-  <div id="pct" style="font-weight:700"></div>
-  <div class="kpis" id="kpis"></div>
- </div>
- <div class="card"><h2>Calculadora rápida</h2>
-  <div class="g2">
-   <label class="f">Valor da venda (R$)<input id="cv" type="number" inputmode="decimal" step="any" oninput="calc()"></label>
-   <label class="f">Desconto livre (%)<input id="cd" type="number" inputmode="decimal" step="any" oninput="calc()"></label>
-   <label class="f">Nº de parcelas<input id="cp" type="number" inputmode="numeric" min="1" max="24" oninput="calc()"></label>
-   <label class="f">Juros ao mês (%)<input id="cj" type="number" inputmode="decimal" step="any" oninput="calc()"></label>
+
+  <div class="card">
+    <h2>Vendas por vendedora / vendedor</h2>
+    <div id="saleForm"></div>
+    <div id="sellersSalesList"></div>
+    <div id="recentSales"></div>
   </div>
-  <div id="cout"></div>
- </div>
+
+  <div class="card">
+    <h2>Calculadora rápida</h2>
+    <div class="g2">
+      <label class="f">Valor da venda (R$)<input id="cv" type="number" inputmode="decimal" step="any" oninput="calc()"></label>
+      <label class="f">Desconto livre (%)<input id="cd" type="number" inputmode="decimal" step="any" oninput="calc()"></label>
+      <label class="f">Nº de parcelas<input id="cp" type="number" inputmode="numeric" min="1" max="24" oninput="calc()"></label>
+      <label class="f">Juros ao mês (%)<input id="cj" type="number" inputmode="decimal" step="any" oninput="calc()"></label>
+    </div>
+    <div id="cout"></div>
+  </div>
 </section>
 
+<!-- ABA 1: ROTINA -->
 <section class="tab" id="t1">
- <div class="card">
-  <div class="g2"><button onclick="novoDia()">☀️ Novo Dia</button><button class="s" onclick="S.edit=!S.edit;rCheck()" id="eb">✏️ Editar listas</button></div>
-  <div id="checks"></div>
- </div>
- <div class="card"><h2>Pendências rápidas</h2>
-  <div class="g2"><input id="pt" placeholder="Ex: trocar lâmpada" style="margin:0"><select id="pc" style="margin:0"><option>Manutenção</option><option>Estoque</option><option>Cliente</option><option>Outro</option></select></div>
-  <button class="w" style="margin-top:10px" onclick="addPend()">+ Adicionar pendência</button>
-  <div id="pends"></div>
- </div>
-</section>
-
-<section class="tab" id="t2">
- <div class="card"><h2>Vendedores</h2>
-  <div class="g2" style="grid-template-columns:1fr auto"><input id="sn" placeholder="Nome do vendedor" style="margin:0"><button onclick="addSell()">+ Add</button></div>
- </div>
- <div class="card"><h2>Grade da semana</h2>
-  <div class="scroll" id="grade"></div>
-  <div class="leg">Toque na célula para alternar: — → Manhã → Tarde → Integral → Folga → Férias. Toque no nome para remover.</div>
- </div>
-</section>
-
-<section class="tab" id="t3">
- <div class="card"><h2>Campos rápidos</h2>
-  <div class="g2">
-   <label class="f">Meta (R$)<input id="fm" type="number" inputmode="decimal" step="any" placeholder="da aba Metas" oninput="fq()"></label>
-   <label class="f">Vendido (R$)<input id="fv" type="number" inputmode="decimal" step="any" placeholder="da aba Metas" oninput="fq()"></label>
+  <div class="card">
+    <div class="g2">
+      <button onclick="novoDia()">☀️ Novo Dia</button>
+      <button class="s" onclick="S.edit=!S.edit;rCheck()" id="eb">✏️ Editar listas</button>
+    </div>
+    <div id="checks"></div>
   </div>
-  <div class="leg">Variáveis: {data} {meta} {vendido} {falta} {pct} {indiv} {porhora} {status} {escala}</div>
- </div>
- <div id="msgs"></div>
+  <div class="card">
+    <h2>Pendências rápidas</h2>
+    <div class="g2">
+      <input id="pt" placeholder="Ex: repor sabonete líquido" style="margin:0">
+      <select id="pc" style="margin:0">
+        <option>Manutenção</option><option>Estoque</option><option>Cliente</option><option>Outro</option>
+      </select>
+    </div>
+    <button class="w" style="margin-top:10px" onclick="addPend()">+ Adicionar pendência</button>
+    <div id="pends"></div>
+  </div>
 </section>
+
+<!-- ABA 2: ESCALA & EQUIPE -->
+<section class="tab" id="t2">
+  <div class="card">
+    <h2>Cadastrar equipe</h2>
+    <div class="g2">
+      <label class="f" style="margin:0">Nome<input id="sn" type="text" placeholder="Ex: Camila" style="margin-top:4px"></label>
+      <label class="f" style="margin:0">Meta individual (R$ opcional)<input id="sm" type="number" inputmode="decimal" step="any" placeholder="Ex: 2500" style="margin-top:4px"></label>
+    </div>
+    <button class="w" style="margin-top:10px" onclick="addSell()">+ Adicionar vendedor(a)</button>
+  </div>
+  <div class="card">
+    <h2>Grade da semana</h2>
+    <div class="scroll" id="grade"></div>
+    <div class="leg">Toque na célula para alternar: — → Manhã → Tarde → Integral → Folga → Férias. Toque no nome para editar meta ou remover.</div>
+  </div>
+</section>
+
+<!-- ABA 3: MENSAGENS -->
+<section class="tab" id="t3">
+  <div class="card">
+    <h2>Campos rápidos</h2>
+    <div class="g2">
+      <label class="f">Meta (R$)<input id="fm" type="number" inputmode="decimal" step="any" placeholder="da aba Metas" oninput="fq()"></label>
+      <label class="f">Vendido (R$)<input id="fv" type="number" inputmode="decimal" step="any" placeholder="da aba Metas" oninput="fq()"></label>
+    </div>
+    <div class="leg">Variáveis: {data} {meta} {vendido} {falta} {pct} {indiv} {porhora} {status} {escala} {equipe_vendas}</div>
+  </div>
+  <div id="msgs"></div>
+</section>
+
+<!-- ABA 4: MAIS -->
 <section class="tab" id="t4">
- <details class="card" open><summary>🏆 Ranking de vendas do dia</summary><div id="rank"></div></details>
- <details class="card"><summary>📈 Ticket médio e conversão</summary>
-  <div class="g2"><label class="f">Vendas (R$)<input id="m_iv" type="number" inputmode="decimal" step="any" oninput="ind()"></label><label class="f">Nº de atendimentos/vendas<input id="m_ia" type="number" inputmode="numeric" oninput="ind()"></label><label class="f">Peças vendidas<input id="m_ip" type="number" inputmode="numeric" oninput="ind()"></label><label class="f">Pessoas que entraram<input id="m_if" type="number" inputmode="numeric" oninput="ind()"></label></div><div id="iout"></div></details>
- <details class="card"><summary>💰 Comissão</summary>
-  <div class="g2"><label class="f">Comissão (%)<input id="m_cp" type="number" inputmode="decimal" step="any" oninput="com()"></label><label class="f">Venda avulsa (R$)<input id="m_cv" type="number" inputmode="decimal" step="any" oninput="com()"></label></div><div class="leg">Abaixo, a comissão de cada vendedor usa os valores do Ranking.</div><div id="cout2"></div></details>
- <details class="card"><summary>🪙 Troco</summary>
-  <div class="g2"><label class="f">Total da compra (R$)<input id="m_tt" type="number" inputmode="decimal" step="any" oninput="troco()"></label><label class="f">Valor recebido (R$)<input id="m_tr" type="number" inputmode="decimal" step="any" oninput="troco()"></label></div><div id="tout"></div></details>
- <details class="card"><summary>📦 Reposição / Estoque</summary>
-  <div class="g2" style="grid-template-columns:1fr auto"><input id="m_en" placeholder="Ex: camiseta M preta (2 un)" style="margin:0"><button onclick="addEstq()">+ Add</button></div><div id="estq"></div></details>
- <details class="card"><summary>📞 Contatos úteis</summary>
-  <input id="m_cn" placeholder="Nome (ex: manutenção)" style="margin:0 0 8px"><div class="g2" style="grid-template-columns:1fr auto"><input id="m_ct" type="tel" placeholder="Telefone com DDD" style="margin:0"><button onclick="addCont()">+ Add</button></div><div id="cont"></div></details>
- <details class="card"><summary>🗓️ Histórico de fechamentos</summary>
-  <button class="w" onclick="saveHist()">💾 Salvar fechamento de hoje</button><div id="hist"></div></details>
- <details class="card"><summary>📝 Bloco de notas</summary><textarea id="m_nt" placeholder="Anotações livres, recados, ocorrências..." oninput="S.note=this.value;save()"></textarea></details>
- <details class="card"><summary>💾 Backup dos dados</summary>
-  <button class="w" id="bkb" onclick="cpy(JSON.stringify(S),this)">📋 Copiar backup</button><textarea id="m_bk" placeholder="Cole aqui um backup para restaurar" style="min-height:70px;margin-top:10px"></textarea><button class="s w" style="margin-top:10px" onclick="bkImp()">Restaurar backup</button></details>
+  <details class="card" open><summary>🏆 Resumo e ranking da equipe</summary><div id="rank"></div></details>
+  <details class="card"><summary>📈 Ticket médio e conversão</summary>
+    <div class="g2">
+      <label class="f">Vendas (R$)<input id="m_iv" type="number" inputmode="decimal" step="any" oninput="ind()"></label>
+      <label class="f">Nº de atendimentos/vendas<input id="m_ia" type="number" inputmode="numeric" oninput="ind()"></label>
+      <label class="f">Peças vendidas<input id="m_ip" type="number" inputmode="numeric" oninput="ind()"></label>
+      <label class="f">Pessoas que entraram<input id="m_if" type="number" inputmode="numeric" oninput="ind()"></label>
+    </div>
+    <div id="iout"></div>
+  </details>
+  <details class="card"><summary>💰 Comissão</summary>
+    <div class="g2">
+      <label class="f">Comissão (%)<input id="m_cp" type="number" inputmode="decimal" step="any" oninput="com()"></label>
+      <label class="f">Venda avulsa (R$)<input id="m_cv" type="number" inputmode="decimal" step="any" oninput="com()"></label>
+    </div>
+    <div class="leg">A comissão de cada vendedor usa o total vendido registrado para ele.</div>
+    <div id="cout2"></div>
+  </details>
+  <details class="card"><summary>🪙 Troco</summary>
+    <div class="g2">
+      <label class="f">Total da compra (R$)<input id="m_tt" type="number" inputmode="decimal" step="any" oninput="troco()"></label>
+      <label class="f">Valor recebido (R$)<input id="m_tr" type="number" inputmode="decimal" step="any" oninput="troco()"></label>
+    </div>
+    <div id="tout"></div>
+  </details>
+  <details class="card"><summary>📦 Reposição / Estoque</summary>
+    <div class="g2" style="grid-template-columns:1fr auto">
+      <input id="m_en" placeholder="Ex: néctar de pitanga 200ml (3 un)" style="margin:0">
+      <button onclick="addEstq()">+ Add</button>
+    </div>
+    <div id="estq"></div>
+  </details>
+  <details class="card"><summary>📞 Contatos úteis</summary>
+    <input id="m_cn" placeholder="Nome (ex: manutenção / shopping)" style="margin:0 0 8px">
+    <div class="g2" style="grid-template-columns:1fr auto">
+      <input id="m_ct" type="tel" placeholder="Telefone com DDD" style="margin:0">
+      <button onclick="addCont()">+ Add</button>
+    </div>
+    <div id="cont"></div>
+  </details>
+  <details class="card"><summary>🗓️ Histórico de fechamentos</summary>
+    <button class="w" onclick="saveHist()">💾 Salvar fechamento de hoje</button>
+    <div id="hist"></div>
+  </details>
+  <details class="card"><summary>📝 Bloco de notas</summary>
+    <textarea id="m_nt" placeholder="Anotações livres, recados, ocorrências..." oninput="S.note=this.value;save()"></textarea>
+  </details>
+  <details class="card"><summary>💾 Backup dos dados</summary>
+    <button class="w" id="bkb" onclick="cpy(JSON.stringify(S),this)">📋 Copiar backup</button>
+    <textarea id="m_bk" placeholder="Cole aqui um backup para restaurar" style="min-height:70px;margin-top:10px"></textarea>
+    <button class="s w" style="margin-top:10px" onclick="bkImp()">Restaurar backup</button>
+  </details>
 </section>
 </main>
 <nav id="nav"></nav>
@@ -140,128 +317,439 @@ a{text-decoration:none;color:inherit}
 <script>
 var DIAS=["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"],OPT=["","M","T","I","F","V"],LAB=["—","Manhã","Tarde","Integral","Folga","Férias"];
 var TPL={
- bom:{n:"☀️ Bom dia e Meta do Dia",t:"☀️ Bom dia, equipe!\n\nHoje ({data}) nossa meta é {meta}.\nA meta individual de cada vendedor é {indiv}.\nVamos com foco, atendimento de excelência e muita energia! 💪"},
- par:{n:"📊 Parcial da Tarde",t:"📊 Parcial da tarde ({data})\n\nVendido até agora: {vendido}\nMeta do dia: {meta} ({pct})\nFalta: {falta}\n\nPrecisamos de {porhora} por hora até o fechamento. Bora fechar essa meta! 🚀"},
- fec:{n:"🌙 Fechamento do Dia",t:"🌙 Fechamento do dia ({data})\n\nMeta: {meta}\nVendido: {vendido} ({pct})\n{status}\n\nObrigado a todos pelo empenho! Amanhã tem mais. 👏"},
- esc:{n:"📅 Aviso de Escala",t:"📅 Aviso de escala da semana\n\n{escala}\n\nQualquer troca, falar comigo com antecedência. Obrigado!"}
+  bom:{n:"☀️ Bom dia e Meta do Dia",t:"☀️ Bom dia, equipe!\n\nHoje ({data}) nossa meta na loja é {meta}.\nMeta base por pessoa: {indiv}.\nFoco na experimentação no balcão, kits presente e encantamento! ✨"},
+  par:{n:"📊 Parcial do Dia",t:"📊 Parcial do dia ({data})\n\nVendido até agora: {vendido}\nMeta do dia: {meta} ({pct})\nFalta: {falta}\n\n{equipe_vendas}\n\nRitmo necessário: {porhora}/h até o fechamento. Bora! 💛"},
+  fec:{n:"🌙 Fechamento do Dia",t:"🌙 Fechamento do dia ({data})\n\nMeta: {meta}\nVendido: {vendido} ({pct})\n{status}\n\n{equipe_vendas}\n\nParabéns pelo trabalho de hoje, equipe! 🌿"},
+  esc:{n:"📅 Aviso de Escala",t:"📅 Aviso de escala da semana\n\n{escala}\n\nQualquer troca, falar comigo com antecedência. Obrigada!"}
 };
-var DEF={theme:"dark",meta:"",vend:"",hrs:"",nv:"",calc:{v:"",d:"",p:"",j:""},edit:false,
- chk:{Abertura:["Ligar luzes e ar-condicionado","Conferir caixa e troco","Verificar vitrines e preços","Alinhar meta com a equipe","Checar limpeza da loja"],
- Turno:["Acompanhar parcial da meta","Fazer reposição de estoque","Revisar atendimento no salão","Responder clientes no WhatsApp","Conferir pausas da equipe"],
- Fechamento:["Fechar caixa e conferir valores","Enviar mensagem de fechamento","Organizar estoque e vitrines","Desligar luzes e equipamentos","Trancar e ativar alarme"]},
- done:{},pend:[],sell:[],esc:{},msgs:{},fm:"",fv:"",tab:0,rank:{},com:"",estq:[],cont:[],hist:[],note:""};
+var DEF={
+  theme:"dark",meta:"",vend:"",hrs:"",nv:"",calc:{v:"",d:"",p:"",j:""},edit:false,
+  chk:{
+    Abertura:["Ligar luzes, som e ar-condicionado","Conferir caixa e troco","Verificar vitrines, provadores e preços","Alinhar meta e destaques do dia com a equipe","Checar limpeza e aromatização da loja"],
+    Turno:["Acompanhar parcial da meta e vendas da equipe","Fazer reposição de estoque e testadores","Revisar atendimento e abordagem no salão","Responder clientes no WhatsApp","Conferir pausas e horários da equipe"],
+    Fechamento:["Fechar caixa e conferir valores","Enviar mensagem de fechamento","Organizar estoque, vitrines e kits","Desligar luzes e equipamentos","Trancar e ativar alarme"]
+  },
+  done:{},pend:[],sell:[],esc:{},sales:[],msgs:{},fm:"",fv:"",tab:0,rank:{},com:"",estq:[],cont:[],hist:[],note:""
+};
 var S=JSON.parse(JSON.stringify(DEF));
-try{var raw=localStorage.getItem("ag_v1");if(raw){var o=JSON.parse(raw);for(var k in o)S[k]=o[k];}}catch(e){}
+try{
+  var raw=localStorage.getItem("ag_v1");
+  if(raw){
+    var o=JSON.parse(raw);
+    for(var k in o)if(o[k]!==undefined)S[k]=o[k];
+  }
+}catch(e){}
+if(!Array.isArray(S.sell))S.sell=[];
+if(!Array.isArray(S.sales))S.sales=[];
+if(!S.rank||typeof S.rank!=="object")S.rank={};
+if(!S.esc||typeof S.esc!=="object")S.esc={};
+
 function save(){try{localStorage.setItem("ag_v1",JSON.stringify(S))}catch(e){}}
 var $=function(i){return document.getElementById(i)};
-var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})};
-var n=function(v){return parseFloat(String(v).replace(",","."))||0};
-var R=function(v){return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})};
+var esc=function(s){return String(s||"").replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})};
+var n=function(v){return parseFloat(String(v==null?"":v).replace(",","."))||0};
+var R=function(v){return (Number.isFinite(v)?v:0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})};
 var uid=function(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)};
 
-function setTheme(t){S.theme=t;document.documentElement.setAttribute("data-theme",t);$("th").textContent=t==="dark"?"☀️":"🌙";save()}
+function setTheme(t){
+  S.theme=t;
+  document.documentElement.setAttribute("data-theme",t);
+  $("th").textContent=t==="dark"?"☀️":"🌙";
+  save();
+}
 function toggleTheme(){setTheme(S.theme==="dark"?"light":"dark")}
 
 var NAV=[["🎯","Metas"],["✅","Rotina"],["📅","Escala"],["💬","Mensagens"],["🧰","Mais"]];
-function go(i){S.tab=i;save();for(var j=0;j<5;j++)$("t"+j).classList.toggle("on",j===i);
- $("nav").innerHTML=NAV.map(function(x,j){return '<button class="'+(j===i?"on":"")+'" onclick="go('+j+')"><b>'+x[0]+'</b>'+x[1]+'</button>'}).join("");
- if(i===3)rMsgs();if(i===4)rMais();window.scrollTo(0,0)}
+function go(i){
+  S.tab=i;save();
+  for(var j=0;j<5;j++)$("t"+j).classList.toggle("on",j===i);
+  $("nav").innerHTML=NAV.map(function(x,j){
+    return '<button class="'+(j===i?"on":"")+'" onclick="go('+j+')"><b>'+x[0]+'</b>'+x[1]+'</button>';
+  }).join("");
+  if(i===0){rSales();}
+  if(i===2){rGrade();}
+  if(i===3){rMsgs();}
+  if(i===4){rMais();}
+  window.scrollTo(0,0);
+}
+
+/* VENDAS INDIVIDUAIS */
+function sellerTotal(id){
+  var fromLogs=S.sales.filter(function(x){return x.sid===id;}).reduce(function(acc,x){return acc+n(x.val);},0);
+  var manual=n(S.rank[id]);
+  return Math.max(fromLogs,manual);
+}
+function teamSalesTotal(){
+  var seen={};
+  var tot=0;
+  S.sell.forEach(function(s){
+    seen[s.id]=true;
+    tot+=sellerTotal(s.id);
+  });
+  Object.keys(S.rank).forEach(function(id){
+    if(!seen[id])tot+=n(S.rank[id]);
+  });
+  return tot;
+}
+function teamSalesSummaryText(){
+  if(!S.sell.length)return"Equipe: sem vendedores cadastrados.";
+  return "Vendas da equipe:\n"+S.sell.map(function(s){
+    var t=sellerTotal(s.id),m=n(s.goal);
+    return "• "+s.n+": "+R(t)+(m>0?" ("+(t/m*100).toFixed(0)+"% da meta de "+R(m)+")":"");
+  }).join("\n");
+}
+function addSale(){
+  var sel=$("sl_vendedor"),valIn=$("sl_valor"),obsIn=$("sl_obs");
+  if(!sel||!sel.value){alert("Cadastre ou selecione um vendedor primeiro.");return;}
+  var val=n(valIn.value);
+  if(val<=0){alert("Informe um valor de venda maior que zero.");return;}
+  var sid=sel.value;
+  var obs=obsIn?obsIn.value.trim():"";
+  var hora=new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+  S.sales.unshift({id:uid(),sid:sid,val:val,obs:obs,hora:hora});
+  // Mantém rank sincronizado com o total por lançamentos caso não tenha ajuste manual maior
+  var sumLogs=S.sales.filter(function(x){return x.sid===sid;}).reduce(function(a,b){return a+n(b.val);},0);
+  if(sumLogs>=n(S.rank[sid]))S.rank[sid]=String(sumLogs);
+  valIn.value="";
+  if(obsIn)obsIn.value="";
+  save();
+  rSales();
+  if($("t4").classList.contains("on")){rRank();com();}
+}
+function delSale(id){
+  S.sales=S.sales.filter(function(x){return x.id!==id;});
+  save();
+  rSales();
+  if($("t4").classList.contains("on")){rRank();com();}
+}
+function syncSalesToVend(){
+  var tot=teamSalesTotal();
+  S.vend=String(tot);
+  if($("vend"))$("vend").value=S.vend;
+  save();
+  rMeta();
+  rSales();
+}
+function clearDaySales(){
+  if(!confirm("Zerar todas as vendas lançadas e o ranking do dia?"))return;
+  S.sales=[];
+  S.rank={};
+  save();
+  rSales();
+  if($("t4").classList.contains("on")){rRank();com();}
+}
+function rSales(){
+  var formEl=$("saleForm"),listEl=$("sellersSalesList"),recEl=$("recentSales");
+  if(!formEl||!listEl||!recEl)return;
+  if(!S.sell.length){
+    formEl.innerHTML='<div class="empty">Nenhum vendedor cadastrado ainda. Vá na aba <b>Escala</b> para adicionar a equipe.</div>';
+    listEl.innerHTML="";
+    recEl.innerHTML="";
+    return;
+  }
+  var curSel=( $("sl_vendedor") && $("sl_vendedor").value ) || S.sell[0].id;
+  formEl.innerHTML=
+    '<div class="g2">'+
+      '<label class="f" style="margin:0">Vendedor(a)<select id="sl_vendedor" style="margin-top:4px">'+
+        S.sell.map(function(s){return '<option value="'+esc(s.id)+'"'+(s.id===curSel?' selected':'')+'>'+esc(s.n)+'</option>';}).join("")+
+      '</select></label>'+
+      '<label class="f" style="margin:0">Valor da venda (R$)<input id="sl_valor" type="number" inputmode="decimal" step="any" placeholder="0,00" style="margin-top:4px"></label>'+
+    '</div>'+
+    '<label class="f" style="margin-top:10px">Observação (opcional)<input id="sl_obs" type="text" placeholder="Ex: kit presente, venda adicional, perfumaria"></label>'+
+    '<button class="w" onclick="addSale()">+ Registrar venda</button>';
+
+  var totTeam=teamSalesTotal();
+  var sorted=[].concat(S.sell).sort(function(a,b){return sellerTotal(b.id)-sellerTotal(a.id);});
+  var med=["🥇","🥈","🥉"];
+
+  listEl.innerHTML=
+    '<h3>Total por vendedor ('+R(totTeam)+')</h3>'+
+    sorted.map(function(s,idx){
+      var v=sellerTotal(s.id);
+      var g=n(s.goal);
+      var pctG=g>0?Math.min(100,v/g*100):0;
+      var share=totTeam>0?(v/totTeam*100):0;
+      var badge=v>0?(med[idx]||(idx+1)+"º"):"•";
+      var sub=g>0
+        ? "Meta: "+R(g)+" ("+(v/g*100).toFixed(0)+"%) · Falta: "+R(Math.max(0,g-v))+" · "+share.toFixed(0)+"% da loja"
+        : share.toFixed(0)+"% do total da equipe";
+      return '<div class="v-card">'+
+        '<div class="v-top"><span class="v-name">'+badge+' '+esc(s.n)+'</span><span class="v-tot">'+R(v)+'</span></div>'+
+        '<div class="v-sub">'+sub+'</div>'+
+        (g>0?'<div class="v-bar '+(v>=g?"ok":"")+'"><i style="width:'+pctG+'%"></i></div>':"")+
+      '</div>';
+    }).join("")+
+    '<div class="g2" style="margin-top:10px">'+
+      '<button onclick="syncSalesToVend()">↻ Usar total no Vendido</button>'+
+      '<button class="s" onclick="clearDaySales()">Zerar vendas do dia</button>'+
+    '</div>';
+
+  if(!S.sales.length){
+    recEl.innerHTML='<h3>Últimos lançamentos</h3><div class="empty">Nenhuma venda avulsa lançada hoje.</div>';
+    return;
+  }
+  var mapName={};S.sell.forEach(function(s){mapName[s.id]=s.n;});
+  recEl.innerHTML=
+    '<h3>Últimos lançamentos ('+S.sales.length+')</h3>'+
+    S.sales.slice(0,12).map(function(item){
+      return '<div class="sale-item">'+
+        '<div class="grow"><b>'+esc(mapName[item.sid]||"Vendedor")+'</b> · <span class="tag">'+esc(item.hora||"")+'</span>'+
+          (item.obs?'<div class="v-sub">'+esc(item.obs)+'</div>':"")+
+        '</div>'+
+        '<b>'+R(n(item.val))+'</b>'+
+        '<button class="x" onclick="delSale(\''+item.id+'\')" title="Remover lançamento">✕</button>'+
+      '</div>';
+    }).join("");
+}
 
 /* METAS */
-function stats(){var m=n(S.meta),v=n(S.vend),h=n(S.hrs),q=n(S.nv),f=Math.max(0,m-v);
- return{m:m,v:v,f:f,pct:m>0?Math.min(100,v/m*100):0,ph:h>0?f/h:0,iv:q>0?m/q:0,fv:q>0?f/q:0,h:h,q:q}}
-function mv(){S.meta=$("meta").value;S.vend=$("vend").value;S.hrs=$("hrs").value;S.nv=$("nv").value;save();rMeta()}
-function rMeta(){var s=stats();$("barf").style.width=s.pct+"%";$("bar").classList.toggle("ok",s.m>0&&s.f===0);
- $("pct").textContent=s.m>0?(s.f===0?"🎉 Meta batida! ":"")+s.pct.toFixed(1).replace(".",",")+"% da meta":"Informe a meta para começar";
- var k=function(l,v,w){return '<div class="kpi'+(w?" wide":"")+'"><small>'+l+'</small><b>'+v+'</b></div>'};
- $("kpis").innerHTML=k("Falta para a meta",R(s.f),1)+k("Vender por hora",s.h>0?R(s.ph):"—")+k("Meta individual",s.q>0?R(s.iv):"—")+k("Falta por vendedor",s.q>0?R(s.fv):"—",1)}
-function calc(){var c=S.calc;c.v=$("cv").value;c.d=$("cd").value;c.p=$("cp").value;c.j=$("cj").value;save();
- var v=n(c.v),h="";if(v<=0){$("cout").innerHTML='<div class="empty">Digite o valor da venda.</div>';return}
- var ds=[5,10,15,20];if(n(c.d)>0)ds.push(n(c.d));
- h+="<h3>Descontos progressivos</h3>"+ds.map(function(d,i){var f=v*(1-d/100);return '<div class="row"><span>'+(i===4?"Livre ":"")+d+'% off</span><b>'+R(f)+'</b><span class="tag" style="flex:none">−'+R(v-f)+"</span></div>"}).join("");
- var base=n(c.d)>0?v*(1-n(c.d)/100):v,p=Math.max(1,Math.min(24,Math.round(n(c.p))||1)),j=n(c.j)/100;
- var pm=j>0?base*j/(1-Math.pow(1+j,-p)):base/p;
- h+="<h3>Parcelamento</h3><div class=\"kpis\"><div class=\"kpi\"><small>"+p+"x de</small><b>"+R(pm)+"</b></div><div class=\"kpi\"><small>Total</small><b>"+R(pm*p)+"</b></div></div>";
- $("cout").innerHTML=h}
+function stats(){
+  var m=n(S.meta),v=n(S.vend),h=n(S.hrs),q=n(S.nv),f=Math.max(0,m-v);
+  return{m:m,v:v,f:f,pct:m>0?Math.min(100,v/m*100):0,ph:h>0?f/h:0,iv:q>0?m/q:0,fv:q>0?f/q:0,h:h,q:q};
+}
+function mv(){
+  S.meta=$("meta").value;S.vend=$("vend").value;S.hrs=$("hrs").value;S.nv=$("nv").value;
+  save();rMeta();
+}
+function rMeta(){
+  var s=stats();
+  $("barf").style.width=s.pct+"%";
+  $("bar").classList.toggle("ok",s.m>0&&s.f===0);
+  $("pct").textContent=s.m>0?(s.f===0?"🎉 Meta batida! ":"")+s.pct.toFixed(1).replace(".",",")+"% da meta":"Informe a meta para começar";
+  var k=function(l,v,w){return '<div class="kpi'+(w?" wide":"")+'"><small>'+l+'</small><b>'+v+'</b></div>';};
+  $("kpis").innerHTML=
+    k("Falta para a meta",R(s.f),1)+
+    k("Vender por hora",s.h>0?R(s.ph):"—")+
+    k("Meta individual",s.q>0?R(s.iv):"—")+
+    k("Falta por vendedor",s.q>0?R(s.fv):"—",1);
+}
+function calc(){
+  var c=S.calc;c.v=$("cv").value;c.d=$("cd").value;c.p=$("cp").value;c.j=$("cj").value;save();
+  var v=n(c.v),h="";
+  if(v<=0){$("cout").innerHTML='<div class="empty">Digite o valor da venda.</div>';return;}
+  var ds=[5,10,15,20];if(n(c.d)>0)ds.push(n(c.d));
+  h+="<h3>Descontos progressivos</h3>"+ds.map(function(d,i){
+    var f=v*(1-d/100);
+    return '<div class="row"><span>'+(i===4?"Livre ":"")+d+'% off</span><b>'+R(f)+'</b><span class="tag" style="flex:none">−'+R(v-f)+'</span></div>';
+  }).join("");
+  var base=n(c.d)>0?v*(1-n(c.d)/100):v,p=Math.max(1,Math.min(24,Math.round(n(c.p))||1)),j=n(c.j)/100;
+  var pm=j>0?base*j/(1-Math.pow(1+j,-p)):base/p;
+  h+="<h3>Parcelamento</h3><div class=\"kpis\"><div class=\"kpi\"><small>"+p+"x de</small><b>"+R(pm)+"</b></div><div class=\"kpi\"><small>Total</small><b>"+R(pm*p)+"</b></div></div>";
+  $("cout").innerHTML=h;
+}
 
 /* ROTINA */
-function novoDia(){if(confirm("Desmarcar todos os itens para um novo dia?")){S.done={};S.rank={};save();rCheck()}}
-function rCheck(){var h="";$("eb").textContent=S.edit?"✔️ Concluir edição":"✏️ Editar listas";
- Object.keys(S.chk).forEach(function(g){var it=S.chk[g],d=it.filter(function(_,i){return S.done[g+i]}).length;
-  h+="<h3>"+g+" · "+d+"/"+it.length+"</h3>";
-  it.forEach(function(t,i){var id=g+i;
-   if(S.edit)h+='<div class="row"><input value="'+esc(t)+'" onchange="S.chk[\''+g+"'].splice("+i+',1,this.value);save()"><button class="x" onclick="delIt(\''+g+"',"+i+')">✕</button></div>';
-   else h+='<label class="row"><input type="checkbox" '+(S.done[id]?"checked":"")+' onchange="S.done[\''+id+"']=this.checked;save();rCheck()\"><span class=\""+(S.done[id]?"done":"")+'">'+esc(t)+"</span></label>"});
-  if(S.edit)h+='<div class="row"><input id="a_'+g+'" placeholder="Novo item" ><button onclick="addIt(\''+g+'\')">+</button></div>'});
- $("checks").innerHTML=h}
+function novoDia(){
+  if(confirm("Desmarcar todos os itens, zerar vendas do dia e iniciar um novo dia?")){
+    S.done={};S.rank={};S.sales=[];save();rCheck();rSales();
+  }
+}
+function rCheck(){
+  var h="";$("eb").textContent=S.edit?"✔️ Concluir edição":"✏️ Editar listas";
+  Object.keys(S.chk).forEach(function(g){
+    var it=S.chk[g],d=it.filter(function(_,i){return S.done[g+i];}).length;
+    h+="<h3>"+g+" · "+d+"/"+it.length+"</h3>";
+    it.forEach(function(t,i){
+      var id=g+i;
+      if(S.edit){
+        h+='<div class="row"><input value="'+esc(t)+'" onchange="S.chk[\''+g+"'].splice("+i+',1,this.value);save()"><button class="x" onclick="delIt(\''+g+"',"+i+')">✕</button></div>';
+      }else{
+        h+='<label class="row"><input type="checkbox" '+(S.done[id]?"checked":"")+' onchange="S.done[\''+id+"']=this.checked;save();rCheck()\"><span class=\""+(S.done[id]?"done":"")+'">'+esc(t)+"</span></label>";
+      }
+    });
+    if(S.edit)h+='<div class="row"><input id="a_'+g+'" placeholder="Novo item"><button onclick="addIt(\''+g+'\')">+</button></div>';
+  });
+  $("checks").innerHTML=h;
+}
 function delIt(g,i){S.chk[g].splice(i,1);S.done={};save();rCheck()}
 function addIt(g){var v=$("a_"+g).value.trim();if(v){S.chk[g].push(v);save();rCheck()}}
 function addPend(){var t=$("pt").value.trim();if(!t)return;S.pend.unshift({id:uid(),t:t,c:$("pc").value,d:false});$("pt").value="";save();rPend()}
-function rPend(){$("pends").innerHTML=S.pend.length?S.pend.map(function(p,i){return '<label class="row"><input type="checkbox" '+(p.d?"checked":"")+' onchange="S.pend['+i+'].d=this.checked;save();rPend()"><span class="'+(p.d?"done":"")+'">'+esc(p.t)+'</span><span class="tag">'+esc(p.c)+'</span><button class="x" onclick="event.preventDefault();S.pend.splice('+i+',1);save();rPend()">✕</button></label>'}).join("")+
- (S.pend.some(function(p){return p.d})?'<button class="s w" style="margin-top:10px" onclick="S.pend=S.pend.filter(function(p){return !p.d});save();rPend()">Limpar resolvidas</button>':""):'<div class="empty">Nenhuma pendência. 🎉</div>'}
+function rPend(){
+  $("pends").innerHTML=S.pend.length
+    ?S.pend.map(function(p,i){
+      return '<label class="row"><input type="checkbox" '+(p.d?"checked":"")+' onchange="S.pend['+i+'].d=this.checked;save();rPend()"><span class="'+(p.d?"done":"")+'">'+esc(p.t)+'</span><span class="tag">'+esc(p.c)+'</span><button class="x" onclick="event.preventDefault();S.pend.splice('+i+',1);save();rPend()">✕</button></label>';
+    }).join("")+(S.pend.some(function(p){return p.d;})?'<button class="s w" style="margin-top:10px" onclick="S.pend=S.pend.filter(function(p){return !p.d});save();rPend()">Limpar resolvidas</button>':"")
+    :'<div class="empty">Nenhuma pendência. 🎉</div>';
+}
 
-/* ESCALA */
-function addSell(){var v=$("sn").value.trim();if(!v)return;var id=uid();S.sell.push({id:id,n:v});S.esc[id]=[0,0,0,0,0,0,0];$("sn").value="";save();rGrade()}
+/* ESCALA & VENDEDORES */
+function addSell(){
+  var v=$("sn").value.trim();
+  var g=$("sm")?$("sm").value:"";
+  if(!v)return;
+  var id=uid();
+  S.sell.push({id:id,n:v,goal:g});
+  S.esc[id]=[0,0,0,0,0,0,0];
+  $("sn").value="";
+  if($("sm"))$("sm").value="";
+  save();
+  rGrade();
+  rSales();
+}
 function cyc(id,d){var a=S.esc[id];a[d]=(a[d]+1)%6;save();rGrade()}
-function rmSell(i){if(confirm("Remover "+S.sell[i].n+"?")){delete S.esc[S.sell[i].id];S.sell.splice(i,1);save();rGrade()}}
-function rGrade(){if(!S.sell.length){$("grade").innerHTML='<div class="empty">Cadastre os vendedores acima.</div>';return}
- var h="<table><thead><tr><th></th>"+DIAS.map(function(d){return"<th>"+d+"</th>"}).join("")+"</tr></thead><tbody>";
- S.sell.forEach(function(s,i){h+='<tr><td class="n" onclick="rmSell('+i+')">'+esc(s.n)+"</td>"+S.esc[s.id].map(function(v,d){return'<td><button class="'+OPT[v]+'" onclick="cyc(\''+s.id+"',"+d+')">'+(LAB[v]==="—"?"—":LAB[v].slice(0,3))+"</button></td>"}).join("")+"</tr>"});
- h+="</tbody><tfoot><tr><td>Na loja</td>"+DIAS.map(function(_,d){return"<td>"+cnt(d)+"</td>"}).join("")+"</tr></tfoot></table>";$("grade").innerHTML=h}
+function editOrRemoveSell(i){
+  var s=S.sell[i];if(!s)return;
+  var escolha=prompt(
+    s.n+" — Digite a nova meta individual em R$ (ou deixe em branco para sem meta),\nOU digite REMOVER para excluir este vendedor:",
+    s.goal||""
+  );
+  if(escolha===null)return;
+  if(escolha.trim().toUpperCase()==="REMOVER"){
+    if(confirm("Remover "+s.n+" da equipe?")){
+      delete S.esc[s.id];
+      delete S.rank[s.id];
+      S.sales=S.sales.filter(function(x){return x.sid!==s.id;});
+      S.sell.splice(i,1);
+      save();rGrade();rSales();
+    }
+    return;
+  }
+  s.goal=escolha.trim();
+  save();rGrade();rSales();
+}
+function rGrade(){
+  if(!S.sell.length){$("grade").innerHTML='<div class="empty">Cadastre os vendedores acima.</div>';return;}
+  var h="<table><thead><tr><th></th>"+DIAS.map(function(d){return"<th>"+d+"</th>"}).join("")+"</tr></thead><tbody>";
+  S.sell.forEach(function(s,i){
+    var gTag=n(s.goal)>0?' <small style="color:var(--mut);font-weight:400">('+R(n(s.goal))+')</small>':"";
+    h+='<tr><td class="n" onclick="editOrRemoveSell('+i+')">'+esc(s.n)+gTag+"</td>"+
+      S.esc[s.id].map(function(v,d){
+        return '<td><button class="'+OPT[v]+'" onclick="cyc(\''+s.id+"',"+d+')">'+(LAB[v]==="—"?"—":LAB[v].slice(0,3))+"</button></td>";
+      }).join("")+"</tr>";
+  });
+  h+="</tbody><tfoot><tr><td>Na loja</td>"+DIAS.map(function(_,d){return"<td>"+cnt(d)+"</td>"}).join("")+"</tr></tfoot></table>";
+  $("grade").innerHTML=h;
+}
 function cnt(d){return S.sell.filter(function(s){var v=S.esc[s.id][d];return v>=1&&v<=3}).length}
-function escText(){if(!S.sell.length)return"(sem escala cadastrada)";
- return DIAS.map(function(D,d){var w=[],f=[];S.sell.forEach(function(s){var v=S.esc[s.id][d];if(v>=1&&v<=3)w.push(s.n+" ("+LAB[v]+")");else if(v>=4)f.push(s.n)});
-  return"*"+D+"*: "+(w.join(", ")||"—")+(f.length?"\n   Folga/Férias: "+f.join(", "):"")}).join("\n")}
+function escText(){
+  if(!S.sell.length)return"(sem escala cadastrada)";
+  return DIAS.map(function(D,d){
+    var w=[],f=[];
+    S.sell.forEach(function(s){var v=S.esc[s.id][d];if(v>=1&&v<=3)w.push(s.n+" ("+LAB[v]+")");else if(v>=4)f.push(s.n);});
+    return "*"+D+"*: "+(w.join(", ")||"—")+(f.length?"\n   Folga/Férias: "+f.join(", "):"");
+  }).join("\n");
+}
 
 /* MENSAGENS */
-function fill(t){var s=stats();if($("fm")&&$("fm").value!==""){s.m=n($("fm").value)}if($("fv")&&$("fv").value!==""){s.v=n($("fv").value)}
- s.f=Math.max(0,s.m-s.v);s.pct=s.m>0?s.v/s.m*100:0;s.ph=s.h>0?s.f/s.h:0;s.iv=s.q>0?s.m/s.q:0;
- var V={data:new Date().toLocaleDateString("pt-BR"),meta:R(s.m),vendido:R(s.v),falta:R(s.f),pct:s.pct.toFixed(1).replace(".",",")+"%",indiv:R(s.iv),porhora:s.h>0?R(s.ph):"—",
-  status:s.f===0&&s.m>0?"Meta batida! 🎉":"Ficou faltando "+R(s.f),escala:escText()};
- return t.replace(/\{(\w+)\}/g,function(a,k){return k in V?V[k]:a})}
+function fill(t){
+  var s=stats();
+  if($("fm")&&$("fm").value!==""){s.m=n($("fm").value)}
+  if($("fv")&&$("fv").value!==""){s.v=n($("fv").value)}
+  s.f=Math.max(0,s.m-s.v);
+  s.pct=s.m>0?s.v/s.m*100:0;
+  s.ph=s.h>0?s.f/s.h:0;
+  s.iv=s.q>0?s.m/s.q:0;
+  var V={
+    data:new Date().toLocaleDateString("pt-BR"),
+    meta:R(s.m),vendido:R(s.v),falta:R(s.f),
+    pct:s.pct.toFixed(1).replace(".",",")+"%",
+    indiv:R(s.iv),porhora:s.h>0?R(s.ph):"—",
+    status:s.f===0&&s.m>0?"Meta batida! 🎉":"Ficou faltando "+R(s.f),
+    escala:escText(),
+    equipe_vendas:teamSalesSummaryText()
+  };
+  return t.replace(/\{(\w+)\}/g,function(a,k){return k in V?V[k]:a});
+}
 function fq(){S.fm=$("fm").value;S.fv=$("fv").value;save();pv()}
 function txt(k){return S.msgs[k]!=null?S.msgs[k]:TPL[k].t}
-function rMsgs(){$("fm").value=S.fm;$("fv").value=S.fv;
- $("msgs").innerHTML=Object.keys(TPL).map(function(k){return'<div class="card"><h2>'+TPL[k].n+'</h2><textarea id="x_'+k+'" oninput="S.msgs[\''+k+'\']=this.value;save();pv()">'+esc(txt(k))+'</textarea><div class="prev" id="p_'+k+'"></div><div class="g2"><button id="b_'+k+'" onclick="cp(\''+k+'\')">📋 Copiar Mensagem</button><button class="s" onclick="delete S.msgs[\''+k+'\'];save();rMsgs()">↺ Modelo original</button></div></div>'}).join("");pv()}
+function rMsgs(){
+  $("fm").value=S.fm;$("fv").value=S.fv;
+  $("msgs").innerHTML=Object.keys(TPL).map(function(k){
+    return '<div class="card"><h2>'+TPL[k].n+'</h2><textarea id="x_'+k+'" oninput="S.msgs[\''+k+'\']=this.value;save();pv()">'+esc(txt(k))+'</textarea><div class="prev" id="p_'+k+'"></div><div class="g2"><button id="b_'+k+'" onclick="cp(\''+k+'\')">📋 Copiar Mensagem</button><button class="s" onclick="delete S.msgs[\''+k+'\'];save();rMsgs()">↺ Modelo original</button></div></div>';
+  }).join("");
+  pv();
+}
 function pv(){Object.keys(TPL).forEach(function(k){var e=$("p_"+k);if(e)e.textContent=fill($("x_"+k).value)})}
-function cp(k){var t=fill($("x_"+k).value),b=$("b_"+k),ok=function(){b.textContent="✔️ Copiado!";setTimeout(function(){b.textContent="📋 Copiar Mensagem"},1800)};
- var fb=function(){var a=document.createElement("textarea");a.value=t;a.style.cssText="position:fixed;opacity:0";document.body.appendChild(a);a.select();try{document.execCommand("copy");ok()}catch(e){b.textContent="Selecione e copie manualmente"}document.body.removeChild(a)};
- if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,fb);else fb()}
+function cp(k){
+  var t=fill($("x_"+k).value),b=$("b_"+k),ok=function(){b.textContent="✔️ Copiado!";setTimeout(function(){b.textContent="📋 Copiar Mensagem"},1800)};
+  var fb=function(){var a=document.createElement("textarea");a.value=t;a.style.cssText="position:fixed;opacity:0";document.body.appendChild(a);a.select();try{document.execCommand("copy");ok()}catch(e){b.textContent="Selecione e copie manualmente"}document.body.removeChild(a)};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,fb);else fb();
+}
 
 /* MAIS */
 function rMais(){$("m_cp").value=S.com;$("m_nt").value=S.note;rRank();ind();com();troco();rEstq();rCont();rHist()}
-function cpy(t,b){var o=b.textContent,ok=()=>{b.textContent="✔️ Copiado!";setTimeout(()=>b.textContent=o,1800)};
- var fb=()=>{var a=document.createElement("textarea");a.value=t;a.style.cssText="position:fixed;opacity:0";document.body.appendChild(a);a.select();try{document.execCommand("copy");ok()}catch(e){alert(t)}document.body.removeChild(a)};
- navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t).then(ok,fb):fb()}
-function rRank(){if(!S.sell.length){$("rank").innerHTML='<div class="empty">Cadastre os vendedores na aba Escala.</div>';return}
- var a=S.sell.map(s=>({s:s,v:n(S.rank[s.id])})).sort((x,y)=>y.v-x.v),t=a.reduce((c,x)=>c+x.v,0),md=["🥇","🥈","🥉"];
- $("rank").innerHTML=a.map((x,i)=>'<div class="row"><span>'+(x.v>0?(md[i]||(i+1)+"º"):"•")+" "+esc(x.s.n)+'</span><input type="number" inputmode="decimal" step="any" style="width:130px;margin:0" placeholder="R$" value="'+(S.rank[x.s.id]||"")+'" onchange="S.rank[\''+x.s.id+'\']=this.value;save();rRank();com()"></div>').join("")+
- '<div class="kpis"><div class="kpi wide"><small>Total do time</small><b>'+R(t)+'</b></div></div><div class="g2" style="margin-top:10px"><button onclick="useTotal(this)">Usar como Vendido</button><button class="s" onclick="S.rank={};save();rRank();com()">Zerar ranking</button></div>'}
-function useTotal(b){var t=Object.keys(S.rank).reduce((c,k)=>c+n(S.rank[k]),0);S.vend=String(t);$("vend").value=S.vend;save();rMeta();b.textContent="✔️ Aplicado na aba Metas"}
-function ind(){var v=n($("m_iv").value),a=n($("m_ia").value),p=n($("m_ip").value),f=n($("m_if").value),k=(l,x)=>'<div class="kpi"><small>'+l+'</small><b>'+x+'</b></div>',d=x=>x.toFixed(2).replace(".",",");
- $("iout").innerHTML='<div class="kpis">'+k("Ticket médio",a>0?R(v/a):"—")+k("Peças por venda (PA)",a>0?d(p/a):"—")+k("Preço médio da peça",p>0?R(v/p):"—")+k("Conversão",f>0?d(a/f*100)+"%":"—")+"</div>"}
-function com(){S.com=$("m_cp").value;save();var c=n(S.com)/100,v=n($("m_cv").value),h="";
- if(c>0&&v>0)h+='<div class="kpi" style="margin:8px 0"><small>Comissão sobre '+R(v)+'</small><b>'+R(v*c)+'</b></div>';
- if(c>0)h+=S.sell.filter(s=>n(S.rank[s.id])>0).map(s=>'<div class="row"><span>'+esc(s.n)+'</span><b>'+R(n(S.rank[s.id])*c)+'</b></div>').join("");
- $("cout2").innerHTML=h}
-function troco(){var t=n($("m_tt").value),r=n($("m_tr").value),d=r-t,o=$("tout");if(t<=0||r<=0){o.innerHTML="";return}
- if(d<0){o.innerHTML='<div class="kpi"><small>Falta receber</small><b>'+R(-d)+'</b></div>';return}
- var c=Math.round(d*100),h="";[20000,10000,5000,2000,1000,500,200,100,50,25,10,5].forEach(x=>{var q=Math.floor(c/x);if(q){h+='<div class="row"><span>'+q+'× '+(x>=200?"nota":"moeda")+' de</span><b>'+R(x/100)+'</b></div>';c-=q*x}});
- o.innerHTML='<div class="kpi"><small>Troco</small><b>'+R(d)+'</b></div>'+h}
+function cpy(t,b){
+  var o=b.textContent,ok=function(){b.textContent="✔️ Copiado!";setTimeout(function(){b.textContent=o},1800)};
+  var fb=function(){var a=document.createElement("textarea");a.value=t;a.style.cssText="position:fixed;opacity:0";document.body.appendChild(a);a.select();try{document.execCommand("copy");ok()}catch(e){alert(t)}document.body.removeChild(a)};
+  navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t).then(ok,fb):fb();
+}
+function rRank(){
+  if(!S.sell.length){$("rank").innerHTML='<div class="empty">Cadastre os vendedores na aba Escala.</div>';return;}
+  var a=S.sell.map(function(s){return{s:s,v:sellerTotal(s.id)};}).sort(function(x,y){return y.v-x.v;}),t=teamSalesTotal(),md=["🥇","🥈","🥉"];
+  $("rank").innerHTML=
+    a.map(function(x,i){
+      return '<div class="row"><span>'+(x.v>0?(md[i]||(i+1)+"º"):"•")+" "+esc(x.s.n)+'</span><b>'+R(x.v)+'</b></div>';
+    }).join("")+
+    '<div class="kpis"><div class="kpi wide"><small>Total vendido pela equipe</small><b>'+R(t)+'</b></div></div>'+
+    '<div class="g2" style="margin-top:10px"><button onclick="syncSalesToVend();rRank()">Usar como Vendido</button><button class="s" onclick="clearDaySales()">Zerar vendas</button></div>';
+}
+function ind(){
+  var v=n($("m_iv").value),a=n($("m_ia").value),p=n($("m_ip").value),f=n($("m_if").value);
+  var k=function(l,x){return '<div class="kpi"><small>'+l+'</small><b>'+x+'</b></div>';};
+  var d=function(x){return x.toFixed(2).replace(".",",");};
+  $("iout").innerHTML='<div class="kpis">'+k("Ticket médio",a>0?R(v/a):"—")+k("Peças por venda (PA)",a>0?d(p/a):"—")+k("Preço médio da peça",p>0?R(v/p):"—")+k("Conversão",f>0?d(a/f*100)+"%":"—")+"</div>";
+}
+function com(){
+  S.com=$("m_cp").value;save();
+  var c=n(S.com)/100,v=n($("m_cv").value),h="";
+  if(c>0&&v>0)h+='<div class="kpi" style="margin:8px 0"><small>Comissão sobre '+R(v)+'</small><b>'+R(v*c)+'</b></div>';
+  if(c>0)h+=S.sell.filter(function(s){return sellerTotal(s.id)>0;}).map(function(s){
+    return '<div class="row"><span>'+esc(s.n)+'</span><b>'+R(sellerTotal(s.id)*c)+'</b></div>';
+  }).join("");
+  $("cout2").innerHTML=h;
+}
+function troco(){
+  var t=n($("m_tt").value),r=n($("m_tr").value),d=r-t,o=$("tout");
+  if(t<=0||r<=0){o.innerHTML="";return;}
+  if(d<0){o.innerHTML='<div class="kpi"><small>Falta receber</small><b>'+R(-d)+'</b></div>';return;}
+  var c=Math.round(d*100),h="";
+  [20000,10000,5000,2000,1000,500,200,100,50,25,10,5].forEach(function(x){
+    var q=Math.floor(c/x);
+    if(q){h+='<div class="row"><span>'+q+'× '+(x>=200?"nota":"moeda")+' de</span><b>'+R(x/100)+'</b></div>';c-=q*x;}
+  });
+  o.innerHTML='<div class="kpi"><small>Troco</small><b>'+R(d)+'</b></div>'+h;
+}
 function addEstq(){var t=$("m_en").value.trim();if(!t)return;S.estq.unshift({t:t,d:false});$("m_en").value="";save();rEstq()}
-function rEstq(){$("estq").innerHTML=S.estq.length?S.estq.map((p,i)=>'<label class="row"><input type="checkbox" '+(p.d?"checked":"")+' onchange="S.estq['+i+'].d=this.checked;save();rEstq()"><span class="'+(p.d?"done":"")+'">'+esc(p.t)+'</span><button class="x" onclick="event.preventDefault();S.estq.splice('+i+',1);save();rEstq()">✕</button></label>').join("")+'<button class="s w" style="margin-top:10px" onclick="cpy(\'Reposição:\\n\'+S.estq.filter(p=>!p.d).map(p=>\'• \'+p.t).join(\'\\n\'),this)">📋 Copiar lista de reposição</button>':'<div class="empty">Nada para repor.</div>'}
+function rEstq(){
+  $("estq").innerHTML=S.estq.length
+    ?S.estq.map(function(p,i){return '<label class="row"><input type="checkbox" '+(p.d?"checked":"")+' onchange="S.estq['+i+'].d=this.checked;save();rEstq()"><span class="'+(p.d?"done":"")+'">'+esc(p.t)+'</span><button class="x" onclick="event.preventDefault();S.estq.splice('+i+',1);save();rEstq()">✕</button></label>';}).join("")+'<button class="s w" style="margin-top:10px" onclick="cpy(\'Reposição:\\n\'+S.estq.filter(function(p){return !p.d;}).map(function(p){return \'• \'+p.t;}).join(\'\\n\'),this)">📋 Copiar lista de reposição</button>'
+    :'<div class="empty">Nada para repor.</div>';
+}
 function addCont(){var a=$("m_cn").value.trim(),b=$("m_ct").value.replace(/\D/g,"");if(!a)return;S.cont.push({n:a,t:b});$("m_cn").value=$("m_ct").value="";save();rCont()}
-function rCont(){$("cont").innerHTML=S.cont.length?S.cont.map((c,i)=>'<div class="row"><span>'+esc(c.n)+'<br><small class="tag">'+esc(c.t||"sem telefone")+'</small></span>'+(c.t?'<a href="tel:'+c.t+'"><button>📞</button></a><a href="https://wa.me/'+(c.t.length<=11?"55":"")+c.t+'" target="_blank" rel="noopener"><button class="s">💬</button></a>':"")+'<button class="x" onclick="S.cont.splice('+i+',1);save();rCont()">✕</button></div>').join(""):'<div class="empty">Ex: manutenção, fornecedor, supervisor.</div>'}
-function saveHist(){var s=stats();if(s.m<=0&&s.v<=0){$("hist").innerHTML='<div class="empty">Preencha meta e vendido na aba Metas primeiro.</div>';return}
- var d=new Date().toLocaleDateString("pt-BR");S.hist=S.hist.filter(x=>x.d!==d);S.hist.unshift({d:d,m:s.m,v:s.v});S.hist=S.hist.slice(0,30);save();rHist()}
-function rHist(){var h=S.hist;$("hist").innerHTML=h.length?h.map((x,i)=>{var p=x.m>0?x.v/x.m*100:0;return'<div class="row"><span>'+x.d+'<br><small class="tag">'+R(x.v)+' de '+R(x.m)+'</small></span><b style="color:var(--'+(p>=100?"ok":"bad")+')">'+p.toFixed(0)+'%</b><button class="x" onclick="S.hist.splice('+i+',1);save();rHist()">✕</button></div>'}).join("")+
- '<div class="kpis"><div class="kpi"><small>Média vendida</small><b>'+R(h.reduce((c,x)=>c+x.v,0)/h.length)+'</b></div><div class="kpi"><small>Metas batidas</small><b>'+h.filter(x=>x.m>0&&x.v>=x.m).length+"/"+h.length+'</b></div></div>':'<div class="empty">Nenhum fechamento salvo ainda.</div>'}
-function bkImp(){try{var o=JSON.parse($("m_bk").value);if(!o||typeof o!=="object")throw 0;S=Object.assign(S,o);save();location.reload()}catch(e){$("m_bk").value="";$("m_bk").placeholder="Backup inválido. Cole novamente."}}
+function rCont(){
+  $("cont").innerHTML=S.cont.length
+    ?S.cont.map(function(c,i){return '<div class="row"><span class="grow">'+esc(c.n)+'<br><small class="tag">'+esc(c.t||"sem telefone")+'</small></span>'+(c.t?'<a href="tel:'+c.t+'"><button>📞</button></a><a href="https://wa.me/'+(c.t.length<=11?"55":"")+c.t+'" target="_blank" rel="noopener"><button class="s">💬</button></a>':"")+'<button class="x" onclick="S.cont.splice('+i+',1);save();rCont()">✕</button></div>';}).join("")
+    :'<div class="empty">Ex: manutenção, fornecedor, shopping.</div>';
+}
+function saveHist(){
+  var s=stats();
+  if(s.m<=0&&s.v<=0){$("hist").innerHTML='<div class="empty">Preencha meta e vendido na aba Metas primeiro.</div>';return;}
+  var d=new Date().toLocaleDateString("pt-BR");
+  S.hist=S.hist.filter(function(x){return x.d!==d;});
+  S.hist.unshift({d:d,m:s.m,v:s.v});
+  S.hist=S.hist.slice(0,30);
+  save();rHist();
+}
+function rHist(){
+  var h=S.hist;
+  $("hist").innerHTML=h.length
+    ?h.map(function(x,i){var p=x.m>0?x.v/x.m*100:0;return '<div class="row"><span class="grow">'+x.d+'<br><small class="tag">'+R(x.v)+' de '+R(x.m)+'</small></span><b style="color:var(--'+(p>=100?"ok":"bad")+')">'+p.toFixed(0)+'%</b><button class="x" onclick="S.hist.splice('+i+',1);save();rHist()">✕</button></div>';}).join("")+'<div class="kpis"><div class="kpi"><small>Média vendida</small><b>'+R(h.reduce(function(c,x){return c+x.v;},0)/h.length)+'</b></div><div class="kpi"><small>Metas batidas</small><b>'+h.filter(function(x){return x.m>0&&x.v>=x.m;}).length+"/"+h.length+'</b></div></div>'
+    :'<div class="empty">Nenhum fechamento salvo ainda.</div>';
+}
+function bkImp(){
+  try{
+    var o=JSON.parse($("m_bk").value);
+    if(!o||typeof o!=="object")throw 0;
+    S=Object.assign(S,o);save();location.reload();
+  }catch(e){
+    $("m_bk").value="";$("m_bk").placeholder="Backup inválido. Cole novamente.";
+  }
+}
 
 /* INIT */
 $("meta").value=S.meta;$("vend").value=S.vend;$("hrs").value=S.hrs;$("nv").value=S.nv;
 $("cv").value=S.calc.v;$("cd").value=S.calc.d;$("cp").value=S.calc.p;$("cj").value=S.calc.j;
-setTheme(S.theme);rMeta();calc();rCheck();rPend();rGrade();go(S.tab||0);
+setTheme(S.theme);rMeta();calc();rCheck();rPend();rGrade();rSales();go(S.tab||0);
 </script>
 </body>
 </html>
