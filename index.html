@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="pt-BR" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -9,24 +9,24 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#fdf8ee;--card:#fffdf9;--tx:#2a1f18;--mut:#736355;
-  --ac:#d99b00;--act:#1f160c;--ok:#3d6b47;--bad:#c63b32;
-  --bd:#e8dec6;--inp:#f5efe0;--bot:#4f6d48;
+  --bg:#fcf8f5;--card:#ffffff;--tx:#261717;--mut:#785f5e;
+  --ac:#c8102e;--act:#ffffff;--ok:#2f6f46;--bad:#b91c1c;
+  --bd:#ecdcd9;--inp:#f8f0ee;--bot:#c8102e;
   color-scheme:light;box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --bg:#16120f;--card:#221c17;--tx:#f6efe3;--mut:#b5a694;
-    --ac:#eab308;--act:#191209;--ok:#5fa36d;--bad:#ff766b;
-    --bd:#3a2f26;--inp:#1b1612;--bot:#7fa374;
+    --bg:#161010;--card:#221818;--tx:#faf3f0;--mut:#bfa8a6;
+    --ac:#e63946;--act:#ffffff;--ok:#5ab378;--bad:#ff7b7b;
+    --bd:#3b2828;--inp:#1b1313;--bot:#f26a75;
     color-scheme:dark
   }
 }
 :root[data-theme="dark"]{
-  --bg:#16120f;--card:#221c17;--tx:#f6efe3;--mut:#b5a694;
-  --ac:#eab308;--act:#191209;--ok:#5fa36d;--bad:#ff766b;
-  --bd:#3a2f26;--inp:#1b1612;--bot:#7fa374;
+  --bg:#161010;--card:#221818;--tx:#faf3f0;--mut:#bfa8a6;
+  --ac:#e63946;--act:#ffffff;--ok:#5ab378;--bad:#ff7b7b;
+  --bd:#3b2828;--inp:#1b1313;--bot:#f26a75;
   color-scheme:dark
 }
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
@@ -38,26 +38,32 @@ body{
 }
 body::before{
   content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);
-  background:var(--bg);z-index:10
+  background:var(--ac);z-index:10
 }
 header{
   position:sticky;top:env(safe-area-inset-top,0px);z-index:5;
   background:var(--card);display:flex;align-items:center;justify-content:space-between;
-  gap:12px;padding:12px 16px;border-bottom:1px solid var(--bd)
+  gap:12px;padding:11px 16px;border-bottom:2px solid var(--ac)
+}
+.brand-wrap{display:flex;align-items:center;gap:11px;min-width:0}
+.logo-badge{
+  width:42px;height:42px;border-radius:12px;background:var(--ac);color:#fff;
+  display:flex;align-items:center;justify-content:center;flex:none;
+  box-shadow:0 3px 10px rgba(200,16,46,.22)
 }
 .brand h1{
   font-family:"Cormorant Garamond",Georgia,serif;
-  font-size:24px;font-weight:700;line-height:1.05;margin:0;letter-spacing:.01em
+  font-size:23px;font-weight:700;line-height:1.05;margin:0;letter-spacing:.01em
 }
 .brand small{
-  display:block;font-size:11px;font-weight:600;color:var(--bot);
-  letter-spacing:.06em;text-transform:uppercase;margin-top:2px
+  display:block;font-size:10.5px;font-weight:700;color:var(--bot);
+  letter-spacing:.08em;text-transform:uppercase;margin-top:2px
 }
 main{max-width:640px;margin:0 auto;padding:14px}
 .tab{display:none}.tab.on{display:block}
 .card{
   background:var(--card);border:1px solid var(--bd);border-radius:18px;
-  padding:15px;margin-bottom:14px;box-shadow:0 2px 10px rgba(42,31,24,.04)
+  padding:15px;margin-bottom:14px;box-shadow:0 2px 10px rgba(38,23,23,.04)
 }
 h2{
   font-family:"Cormorant Garamond",Georgia,serif;
@@ -104,10 +110,6 @@ button.x{min-width:44px;min-height:44px;padding:0;background:transparent;color:v
   display:inline-block;font-size:11px;background:var(--inp);border:1px solid var(--bd);
   border-radius:99px;padding:2px 8px;color:var(--mut)
 }
-.pill-ok{
-  display:inline-block;font-size:11px;font-weight:600;border-radius:99px;
-  padding:2px 8px;background:color-mix(in srgb,var(--ok) 15%,transparent);color:var(--ok)
-}
 .v-card{
   background:var(--inp);border:1px solid var(--bd);border-radius:14px;
   padding:11px 12px;margin-top:8px
@@ -117,7 +119,7 @@ button.x{min-width:44px;min-height:44px;padding:0;background:transparent;color:v
 .v-tot{font-weight:700;font-size:15px;color:var(--ac)}
 .v-sub{font-size:12px;color:var(--mut);margin-top:2px}
 .v-bar{height:8px;background:var(--card);border:1px solid var(--bd);border-radius:99px;overflow:hidden;margin-top:6px}
-.v-bar i{display:block;height:100%;background:var(--bot);transition:width .3s}
+.v-bar i{display:block;height:100%;background:var(--ac);transition:width .3s}
 .v-bar.ok i{background:var(--ok)}
 .sale-item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0;border-bottom:1px dashed var(--bd);font-size:13px}
 .sale-item:last-child{border-bottom:0}
@@ -149,7 +151,7 @@ nav button{
   min-height:56px;padding:0;border-radius:10px
 }
 nav button b{font-size:20px;line-height:1}
-nav button.on{color:var(--ac);background:var(--inp)}
+nav button.on{color:var(--ac);background:var(--inp);font-weight:700}
 .empty{color:var(--mut);font-size:14px;padding:8px 0}
 details>summary{
   font-family:"Cormorant Garamond",Georgia,serif;
@@ -162,9 +164,21 @@ a{text-decoration:none;color:inherit}
 </head>
 <body>
 <header>
-  <div class="brand">
-    <h1>🌿 Assistente da Bia</h1>
-    <small>L'Occitane au Brésil · Gestão de Loja</small>
+  <div class="brand-wrap">
+    <div class="logo-badge" aria-hidden="true">
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+        <circle cx="16" cy="16" r="13.5" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M16 6.5C18.4 10.2 18.4 13.8 16 16C13.6 13.8 13.6 10.2 16 6.5Z" fill="currentColor"/>
+        <path d="M16 25.5C18.4 21.8 18.4 18.2 16 16C13.6 18.2 13.6 21.8 16 25.5Z" fill="currentColor"/>
+        <path d="M6.5 16C10.2 13.6 13.8 13.6 16 16C13.8 18.4 10.2 18.4 6.5 16Z" fill="currentColor"/>
+        <path d="M25.5 16C21.8 13.6 18.2 13.6 16 16C18.2 18.4 21.8 18.4 25.5 16Z" fill="currentColor"/>
+        <circle cx="16" cy="16" r="2.2" fill="#fcf8f5"/>
+      </svg>
+    </div>
+    <div class="brand">
+      <h1>Assistente da Bia</h1>
+      <small>L'Occitane au Brésil · Gestão de Loja</small>
+    </div>
   </div>
   <button class="s" id="th" onclick="toggleTheme()" aria-label="Alternar tema">🌙</button>
 </header>
@@ -317,13 +331,13 @@ a{text-decoration:none;color:inherit}
 <script>
 var DIAS=["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"],OPT=["","M","T","I","F","V"],LAB=["—","Manhã","Tarde","Integral","Folga","Férias"];
 var TPL={
-  bom:{n:"☀️ Bom dia e Meta do Dia",t:"☀️ Bom dia, equipe!\n\nHoje ({data}) nossa meta na loja é {meta}.\nMeta base por pessoa: {indiv}.\nFoco na experimentação no balcão, kits presente e encantamento! ✨"},
-  par:{n:"📊 Parcial do Dia",t:"📊 Parcial do dia ({data})\n\nVendido até agora: {vendido}\nMeta do dia: {meta} ({pct})\nFalta: {falta}\n\n{equipe_vendas}\n\nRitmo necessário: {porhora}/h até o fechamento. Bora! 💛"},
-  fec:{n:"🌙 Fechamento do Dia",t:"🌙 Fechamento do dia ({data})\n\nMeta: {meta}\nVendido: {vendido} ({pct})\n{status}\n\n{equipe_vendas}\n\nParabéns pelo trabalho de hoje, equipe! 🌿"},
+  bom:{n:"☀️ Bom dia e Meta do Dia",t:"☀️ Bom dia, equipe!\n\nHoje ({data}) nossa meta na loja é {meta}.\nMeta base por pessoa: {indiv}.\nFoco na experimentação no balcão, kits presente e encantamento! ❤️"},
+  par:{n:"📊 Parcial do Dia",t:"📊 Parcial do dia ({data})\n\nVendido até agora: {vendido}\nMeta do dia: {meta} ({pct})\nFalta: {falta}\n\n{equipe_vendas}\n\nRitmo necessário: {porhora}/h até o fechamento. Bora! 🔥"},
+  fec:{n:"🌙 Fechamento do Dia",t:"🌙 Fechamento do dia ({data})\n\nMeta: {meta}\nVendido: {vendido} ({pct})\n{status}\n\n{equipe_vendas}\n\nParabéns pelo trabalho de hoje, equipe! ❤️"},
   esc:{n:"📅 Aviso de Escala",t:"📅 Aviso de escala da semana\n\n{escala}\n\nQualquer troca, falar comigo com antecedência. Obrigada!"}
 };
 var DEF={
-  theme:"dark",meta:"",vend:"",hrs:"",nv:"",calc:{v:"",d:"",p:"",j:""},edit:false,
+  theme:"light",meta:"",vend:"",hrs:"",nv:"",calc:{v:"",d:"",p:"",j:""},edit:false,
   chk:{
     Abertura:["Ligar luzes, som e ar-condicionado","Conferir caixa e troco","Verificar vitrines, provadores e preços","Alinhar meta e destaques do dia com a equipe","Checar limpeza e aromatização da loja"],
     Turno:["Acompanhar parcial da meta e vendas da equipe","Fazer reposição de estoque e testadores","Revisar atendimento e abordagem no salão","Responder clientes no WhatsApp","Conferir pausas e horários da equipe"],
@@ -407,7 +421,6 @@ function addSale(){
   var obs=obsIn?obsIn.value.trim():"";
   var hora=new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
   S.sales.unshift({id:uid(),sid:sid,val:val,obs:obs,hora:hora});
-  // Mantém rank sincronizado com o total por lançamentos caso não tenha ajuste manual maior
   var sumLogs=S.sales.filter(function(x){return x.sid===sid;}).reduce(function(a,b){return a+n(b.val);},0);
   if(sumLogs>=n(S.rank[sid]))S.rank[sid]=String(sumLogs);
   valIn.value="";
@@ -417,7 +430,12 @@ function addSale(){
   if($("t4").classList.contains("on")){rRank();com();}
 }
 function delSale(id){
+  var target=S.sales.find(function(x){return x.id===id;});
   S.sales=S.sales.filter(function(x){return x.id!==id;});
+  if(target){
+    var sumLogs=S.sales.filter(function(x){return x.sid===target.sid;}).reduce(function(a,b){return a+n(b.val);},0);
+    S.rank[target.sid]=sumLogs>0?String(sumLogs):"";
+  }
   save();
   rSales();
   if($("t4").classList.contains("on")){rRank();com();}
