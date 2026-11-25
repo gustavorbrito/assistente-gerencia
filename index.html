@@ -279,8 +279,15 @@ a{text-decoration:none;color:inherit}
 <!-- ABA 2: ESCALA & EQUIPE -->
 <section class="tab" id="t2">
   <div class="card">
-    <h2>Hoje na loja</h2>
+    <div class="card-head">
+      <h2>Escala por mês</h2>
+      <input type="month" id="escMonthPicker" class="month-pick" onchange="onSelectEscMonth(this.value)" aria-label="Selecionar mês da escala">
+    </div>
     <div id="todayShift"></div>
+    <div class="g2" style="margin-top:10px">
+      <button class="s" id="copyEscMonthBtn" onclick="cpy(escText(S.esc_month||currentIsoMonth()),this)">📋 Copiar escala do mês</button>
+      <button class="s" onclick="clearEscMonth()">↺ Limpar grade do mês</button>
+    </div>
   </div>
   <div class="card">
     <h2>Cadastrar equipe</h2>
@@ -291,7 +298,7 @@ a{text-decoration:none;color:inherit}
     <button class="w" style="margin-top:10px" onclick="addSell()">+ Adicionar vendedor(a)</button>
   </div>
   <div class="card">
-    <h2>Grade da semana</h2>
+    <h2>Grade da semana (<span id="escMonthLabel"></span>)</h2>
     <div class="scroll" id="grade"></div>
     <div class="leg">Toque na célula para alternar: — → Manhã → Tarde → Integral → Folga → Férias. Toque no nome para editar metas ou remover.</div>
   </div>
@@ -386,7 +393,7 @@ var TPL={
 };
 var DEF={
   theme:"light",meta:"",vend:"",hrs:"",nv:"",pa_meta:"",foco_dia:"",
-  sel_month:"",hist_filter:"",months:{},
+  sel_month:"",esc_month:"",hist_filter:"",months:{},month_esc:{},
   m_meta:"",m_vend:"",m_ref:"",m_sell_vend:{},
   calc:{v:"",d:"",p:"",j:""},edit:false,
   chk:{
@@ -424,6 +431,20 @@ function ensureMonthRecord(iso){
   }
   return S.months[key];
 }
+function ensureEscMonthRecord(iso){
+  var key=iso||currentIsoMonth();
+  if(!S.month_esc[key]||typeof S.month_esc[key]!=="object"){
+    S.month_esc[key]={};
+  }
+  S.sell.forEach(function(s){
+    if(!Array.isArray(S.month_esc[key][s.id])||S.month_esc[key][s.id].length!==7){
+      S.month_esc[key][s.id]=Array.isArray(S.esc[s.id])&&S.esc[s.id].length===7
+        ?S.esc[s.id].slice(0,7)
+        :[0,0,0,0,0,0,0];
+    }
+  });
+  return S.month_esc[key];
+}
 
 function normalizeState(obj){
   var base=JSON.parse(JSON.stringify(DEF));
@@ -440,6 +461,7 @@ function normalizeState(obj){
   if(!Array.isArray(base.cont))base.cont=[];
   if(!Array.isArray(base.hist))base.hist=[];
   if(!base.months||typeof base.months!=="object")base.months={};
+  if(!base.month_esc||typeof base.month_esc!=="object")base.month_esc={};
   if(!base.rank||typeof base.rank!=="object")base.rank={};
   if(!base.m_sell_vend||typeof base.m_sell_vend!=="object")base.m_sell_vend={};
   if(!base.esc||typeof base.esc!=="object")base.esc={};
@@ -450,9 +472,9 @@ function normalizeState(obj){
 
   var curIso=currentIsoMonth();
   if(!base.sel_month)base.sel_month=curIso;
+  if(!base.esc_month)base.esc_month=base.sel_month||curIso;
   if(!base.hist_filter)base.hist_filter=base.sel_month;
 
-  // Migra dados legados (m_meta / m_vend / m_sell_vend) para S.months
   if(!base.months[curIso]){
     base.months[curIso]={
       meta:base.m_meta||"",
@@ -460,7 +482,14 @@ function normalizeState(obj){
       sell:Object.assign({},base.m_sell_vend||{})
     };
   }
-  // Garante que meses presentes no histórico existam em S.months
+  if(!base.month_esc[base.esc_month]){
+    base.month_esc[base.esc_month]={};
+    base.sell.forEach(function(s){
+      base.month_esc[base.esc_month][s.id]=Array.isArray(base.esc[s.id])&&base.esc[s.id].length===7
+        ?base.esc[s.id].slice(0,7)
+        :[0,0,0,0,0,0,0];
+    });
+  }
   base.hist.forEach(function(h){
     var mKey=brDateToIsoMonth(h.d);
     if(!base.months[mKey]){
@@ -667,10 +696,13 @@ function rSales(){
 function onSelectMonth(iso){
   if(!iso)return;
   S.sel_month=iso;
+  S.esc_month=iso;
   S.hist_filter=iso;
   ensureMonthRecord(iso);
+  ensureEscMonthRecord(iso);
   save();
   rMonth();
+  if($("t2").classList.contains("on")){rTodayShift();rGrade();}
   if($("t4").classList.contains("on")){rMonthSummary();rHist();}
 }
 function monthStats(iso){
@@ -888,15 +920,42 @@ function rPend(){
     :'<div class="empty">Nenhuma pendência. 🎉</div>';
 }
 
-/* ESCALA & VENDEDORES */
+/* ESCALA & VENDEDORES COM FILTRO DE MÊS */
 function todayIndex(){var d=new Date().getDay();return d===0?6:d-1;}
+function onSelectEscMonth(iso){
+  if(!iso)return;
+  S.esc_month=iso;
+  ensureEscMonthRecord(iso);
+  save();
+  rTodayShift();
+  rGrade();
+}
+function getMonthGrid(iso){
+  var key=iso||S.esc_month||currentIsoMonth();
+  return ensureEscMonthRecord(key);
+}
+function clearEscMonth(){
+  var iso=S.esc_month||currentIsoMonth();
+  if(!confirm("Limpar todas as marcações da grade em "+formatIsoMonthLabel(iso)+"?"))return;
+  var g={};
+  S.sell.forEach(function(s){g[s.id]=[0,0,0,0,0,0,0];});
+  S.month_esc[iso]=g;
+  if(iso===currentIsoMonth())S.esc=JSON.parse(JSON.stringify(g));
+  save();
+  rTodayShift();
+  rGrade();
+}
 function rTodayShift(){
   var el=$("todayShift");if(!el)return;
-  if(!S.sell.length){el.innerHTML='<div class="empty">Cadastre os vendedores abaixo para visualizar o turno de hoje.</div>';return;}
+  var iso=S.esc_month||currentIsoMonth();
+  if($("escMonthPicker"))$("escMonthPicker").value=iso;
+  if($("escMonthLabel"))$("escMonthLabel").textContent=formatIsoMonthLabel(iso);
+  if(!S.sell.length){el.innerHTML='<div class="empty">Cadastre os vendedores abaixo para visualizar o turno.</div>';return;}
+  var grid=getMonthGrid(iso);
   var d=todayIndex(),nomeDia=DIAS[d];
   var g={M:[],T:[],I:[],F:[],V:[],N:[]};
   S.sell.forEach(function(s){
-    var v=(S.esc[s.id]&&S.esc[s.id][d])||0;
+    var v=(grid[s.id]&&grid[s.id][d])||0;
     var code=OPT[v]||"N";
     g[code].push(s.n);
   });
@@ -904,7 +963,7 @@ function rTodayShift(){
     return '<div class="today-box"><small>'+lbl+'</small><b>'+(arr.length?esc(arr.join(", ")):"—")+'</b></div>';
   };
   el.innerHTML=
-    '<div class="v-sub" style="margin-bottom:4px">Escala automática de <b>'+nomeDia+'</b> ('+new Date().toLocaleDateString("pt-BR")+')</div>'+
+    '<div class="v-sub" style="margin-bottom:4px">Escala de <b>'+nomeDia+'</b> · Mês ref.: <b>'+formatIsoMonthLabel(iso)+'</b></div>'+
     '<div class="today-grid">'+
       box("☀️ Manhã",g.M)+
       box("🌤️ Tarde",g.T)+
@@ -919,12 +978,24 @@ function addSell(){
   var id=uid();
   S.sell.push({id:id,n:v,goal:g,mGoal:""});
   S.esc[id]=[0,0,0,0,0,0,0];
+  var iso=S.esc_month||currentIsoMonth();
+  var grid=getMonthGrid(iso);
+  grid[id]=[0,0,0,0,0,0,0];
   $("sn").value="";
   if($("sm"))$("sm").value="";
   save();
   rTodayShift();rGrade();rSales();rMonth();
 }
-function cyc(id,d){var a=S.esc[id];a[d]=(a[d]+1)%6;save();rTodayShift();rGrade()}
+function cyc(id,d){
+  var iso=S.esc_month||currentIsoMonth();
+  var grid=getMonthGrid(iso);
+  if(!Array.isArray(grid[id]))grid[id]=[0,0,0,0,0,0,0];
+  grid[id][d]=(grid[id][d]+1)%6;
+  if(iso===currentIsoMonth())S.esc[id]=grid[id].slice(0,7);
+  save();
+  rTodayShift();
+  rGrade();
+}
 function editOrRemoveSell(i){
   var s=S.sell[i];if(!s)return;
   var escolha=prompt(
@@ -939,6 +1010,9 @@ function editOrRemoveSell(i){
       Object.keys(S.months).forEach(function(mk){
         if(S.months[mk]&&S.months[mk].sell)delete S.months[mk].sell[s.id];
       });
+      Object.keys(S.month_esc).forEach(function(ek){
+        if(S.month_esc[ek])delete S.month_esc[ek][s.id];
+      });
       S.sales=S.sales.filter(function(x){return x.sid!==s.id;});
       S.sell.splice(i,1);
       save();rTodayShift();rGrade();rSales();rMonth();
@@ -952,24 +1026,41 @@ function editOrRemoveSell(i){
 }
 function rGrade(){
   if(!S.sell.length){$("grade").innerHTML='<div class="empty">Cadastre os vendedores acima.</div>';return;}
+  var iso=S.esc_month||currentIsoMonth();
+  if($("escMonthLabel"))$("escMonthLabel").textContent=formatIsoMonthLabel(iso);
+  var grid=getMonthGrid(iso);
   var tdToday=todayIndex();
   var h="<table><thead><tr><th></th>"+DIAS.map(function(d,idx){return"<th"+(idx===tdToday?' style="color:var(--ac)"':'')+">"+d+"</th>"}).join("")+"</tr></thead><tbody>";
   S.sell.forEach(function(s,i){
     var gTag=n(s.goal)>0?' <small style="color:var(--mut);font-weight:400">('+R(n(s.goal))+')</small>':"";
+    var rowArr=Array.isArray(grid[s.id])?grid[s.id]:[0,0,0,0,0,0,0];
     h+='<tr><td class="n" onclick="editOrRemoveSell('+i+')">'+esc(s.n)+gTag+"</td>"+
-      S.esc[s.id].map(function(v,d){
+      rowArr.map(function(v,d){
         return '<td><button class="'+OPT[v]+'" onclick="cyc(\''+s.id+"',"+d+')">'+(LAB[v]==="—"?"—":LAB[v].slice(0,3))+"</button></td>";
       }).join("")+"</tr>";
   });
-  h+="</tbody><tfoot><tr><td>Na loja</td>"+DIAS.map(function(_,d){return"<td>"+cnt(d)+"</td>"}).join("")+"</tr></tfoot></table>";
+  h+="</tbody><tfoot><tr><td>Na loja</td>"+DIAS.map(function(_,d){return"<td>"+cnt(d,iso)+"</td>"}).join("")+"</tr></tfoot></table>";
   $("grade").innerHTML=h;
 }
-function cnt(d){return S.sell.filter(function(s){var v=S.esc[s.id][d];return v>=1&&v<=3}).length}
-function escText(){
+function cnt(d,iso){
+  var grid=getMonthGrid(iso||S.esc_month||currentIsoMonth());
+  return S.sell.filter(function(s){
+    var v=(grid[s.id]&&grid[s.id][d])||0;
+    return v>=1&&v<=3;
+  }).length;
+}
+function escText(iso){
   if(!S.sell.length)return"(sem escala cadastrada)";
-  return DIAS.map(function(D,d){
+  var targetIso=iso||S.esc_month||currentIsoMonth();
+  var grid=getMonthGrid(targetIso);
+  var header="Escala ("+formatIsoMonthLabel(targetIso)+"):\n";
+  return header+DIAS.map(function(D,d){
     var w=[],f=[];
-    S.sell.forEach(function(s){var v=S.esc[s.id][d];if(v>=1&&v<=3)w.push(s.n+" ("+LAB[v]+")");else if(v>=4)f.push(s.n);});
+    S.sell.forEach(function(s){
+      var v=(grid[s.id]&&grid[s.id][d])||0;
+      if(v>=1&&v<=3)w.push(s.n+" ("+LAB[v]+")");
+      else if(v>=4)f.push(s.n);
+    });
     return "*"+D+"*: "+(w.join(", ")||"—")+(f.length?"\n   Folga/Férias: "+f.join(", "):"");
   }).join("\n");
 }
@@ -999,7 +1090,7 @@ function fill(t){
     pct:s.pct.toFixed(1).replace(".",",")+"%",
     indiv:R(s.iv),porhora:s.h>0?R(s.ph):"—",
     status:s.f===0&&s.m>0?"Meta batida! 🎉":"Ficou faltando "+R(s.f),
-    escala:escText(),
+    escala:escText(S.esc_month||currentIsoMonth()),
     equipe_vendas:teamSalesSummaryText(),
     foco:(S.foco_dia||"").trim()||"Encantamento e venda adicional",
     pa:(S.pa_meta||"").trim()||"—",
@@ -1089,7 +1180,9 @@ function getAvailableMonths(){
   var set={};
   set[currentIsoMonth()]=true;
   if(S.sel_month)set[S.sel_month]=true;
+  if(S.esc_month)set[S.esc_month]=true;
   Object.keys(S.months).forEach(function(k){if(k)set[k]=true;});
+  Object.keys(S.month_esc).forEach(function(k){if(k)set[k]=true;});
   S.hist.forEach(function(h){
     var k=h.month||brDateToIsoMonth(h.d);
     if(k)set[k]=true;
@@ -1110,8 +1203,11 @@ function onFilterHistMonth(val){
   S.hist_filter=val;
   if(val!=="ALL"){
     S.sel_month=val;
+    S.esc_month=val;
     ensureMonthRecord(val);
+    ensureEscMonthRecord(val);
     if($("t0").classList.contains("on"))rMonth();
+    if($("t2").classList.contains("on")){rTodayShift();rGrade();}
   }
   save();
   rMonthSummary();
