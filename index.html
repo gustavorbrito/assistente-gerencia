@@ -88,7 +88,8 @@ button{
 }
 button.s{background:var(--inp);color:var(--tx);border:1px solid var(--bd)}
 button.w{width:100%}
-button.x{min-width:44px;min-height:44px;padding:0;background:transparent;color:var(--bad);font-size:18px}
+button.x{min-width:40px;min-height:40px;padding:0;background:transparent;color:var(--bad);font-size:17px}
+button.ed{min-width:40px;min-height:40px;padding:0;background:transparent;color:var(--mut);font-size:16px}
 .bar{height:18px;background:var(--inp);border:1px solid var(--bd);border-radius:99px;overflow:hidden;margin:8px 0 4px}
 .bar i{display:block;height:100%;width:0;background:var(--ac);transition:width .3s}
 .bar.ok i{background:var(--ok)}
@@ -97,6 +98,10 @@ button.x{min-width:44px;min-height:44px;padding:0;background:transparent;color:v
 .kpi small{color:var(--mut);display:block;font-size:12px}
 .kpi b{font-size:17px}
 .kpi.wide{grid-column:span 2}
+.focus-banner{
+  background:var(--inp);border:1px solid var(--bd);border-left:4px solid var(--ac);
+  border-radius:12px;padding:10px 12px;margin-top:10px;font-size:13px
+}
 .row{
   display:flex;align-items:center;gap:10px;min-height:52px;
   border-bottom:1px solid var(--bd);padding:6px 0
@@ -121,8 +126,11 @@ button.x{min-width:44px;min-height:44px;padding:0;background:transparent;color:v
 .v-bar{height:8px;background:var(--card);border:1px solid var(--bd);border-radius:99px;overflow:hidden;margin-top:6px}
 .v-bar i{display:block;height:100%;background:var(--ac);transition:width .3s}
 .v-bar.ok i{background:var(--ok)}
-.sale-item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0;border-bottom:1px dashed var(--bd);font-size:13px}
+.sale-item{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:7px 0;border-bottom:1px dashed var(--bd);font-size:13px}
 .sale-item:last-child{border-bottom:0}
+.today-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.today-box{background:var(--inp);border:1px solid var(--bd);border-radius:12px;padding:9px 11px;font-size:13px}
+.today-box small{display:block;font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;margin-bottom:3px}
 .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
 table{border-collapse:separate;border-spacing:4px;width:100%}
 th{font-size:12px;color:var(--mut);font-weight:600}
@@ -177,7 +185,7 @@ a{text-decoration:none;color:inherit}
     </div>
     <div class="brand">
       <h1>Assistente da Bia</h1>
-      <small>L'Occitane au Brésil · Gestão de Loja · Shopping Continental</small>
+      <small>L'Occitane au Brésil · Gestão de Loja</small>
     </div>
   </div>
   <button class="s" id="th" onclick="toggleTheme()" aria-label="Alternar tema">🌙</button>
@@ -193,9 +201,12 @@ a{text-decoration:none;color:inherit}
       <label class="f">Vendido até agora (R$)<input id="vend" type="number" inputmode="decimal" step="any" oninput="mv()"></label>
       <label class="f">Horas restantes<input id="hrs" type="number" inputmode="decimal" step="any" oninput="mv()"></label>
       <label class="f">Vendedores no turno<input id="nv" type="number" inputmode="numeric" oninput="mv()"></label>
+      <label class="f">Meta PA (peças/atend.)<input id="pa_meta" type="number" inputmode="decimal" step="any" placeholder="Ex: 2,4" oninput="mv()"></label>
+      <label class="f">Foco / Destaque do dia<input id="foco_dia" type="text" placeholder="Ex: Kit Pitanga / Lançamento" oninput="mv()"></label>
     </div>
     <div class="bar" id="bar"><i id="barf"></i></div>
     <div id="pct" style="font-weight:700"></div>
+    <div id="focusPreview"></div>
     <div class="kpis" id="kpis"></div>
   </div>
 
@@ -243,6 +254,10 @@ a{text-decoration:none;color:inherit}
 <!-- ABA 2: ESCALA & EQUIPE -->
 <section class="tab" id="t2">
   <div class="card">
+    <h2>Hoje na loja</h2>
+    <div id="todayShift"></div>
+  </div>
+  <div class="card">
     <h2>Cadastrar equipe</h2>
     <div class="g2">
       <label class="f" style="margin:0">Nome<input id="sn" type="text" placeholder="Ex: Camila" style="margin-top:4px"></label>
@@ -265,7 +280,7 @@ a{text-decoration:none;color:inherit}
       <label class="f">Meta (R$)<input id="fm" type="number" inputmode="decimal" step="any" placeholder="da aba Metas" oninput="fq()"></label>
       <label class="f">Vendido (R$)<input id="fv" type="number" inputmode="decimal" step="any" placeholder="da aba Metas" oninput="fq()"></label>
     </div>
-    <div class="leg">Variáveis: {data} {meta} {vendido} {falta} {pct} {indiv} {porhora} {status} {escala} {equipe_vendas}</div>
+    <div class="leg">Variáveis: {data} {meta} {vendido} {falta} {pct} {indiv} {porhora} {status} {escala} {equipe_vendas} {foco} {pa} {pendencias} {reposicao}</div>
   </div>
   <div id="msgs"></div>
 </section>
@@ -320,7 +335,10 @@ a{text-decoration:none;color:inherit}
     <textarea id="m_nt" placeholder="Anotações livres, recados, ocorrências..." oninput="S.note=this.value;save()"></textarea>
   </details>
   <details class="card"><summary>💾 Backup dos dados</summary>
-    <button class="w" id="bkb" onclick="cpy(JSON.stringify(S),this)">📋 Copiar backup</button>
+    <div class="g2">
+      <button id="bkb" onclick="cpy(JSON.stringify(S),this)">📋 Copiar backup</button>
+      <button class="s" onclick="bkDownload()">⬇️ Baixar arquivo</button>
+    </div>
     <textarea id="m_bk" placeholder="Cole aqui um backup para restaurar" style="min-height:70px;margin-top:10px"></textarea>
     <button class="s w" style="margin-top:10px" onclick="bkImp()">Restaurar backup</button>
   </details>
@@ -331,13 +349,13 @@ a{text-decoration:none;color:inherit}
 <script>
 var DIAS=["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"],OPT=["","M","T","I","F","V"],LAB=["—","Manhã","Tarde","Integral","Folga","Férias"];
 var TPL={
-  bom:{n:"☀️ Bom dia e Meta do Dia",t:"☀️ Bom dia, equipe!\n\nHoje ({data}) nossa meta na loja é {meta}.\nMeta base por pessoa: {indiv}.\nFoco na experimentação no balcão, kits presente e encantamento! ❤️"},
-  par:{n:"📊 Parcial do Dia",t:"📊 Parcial do dia ({data})\n\nVendido até agora: {vendido}\nMeta do dia: {meta} ({pct})\nFalta: {falta}\n\n{equipe_vendas}\n\nRitmo necessário: {porhora}/h até o fechamento. Bora! 🔥"},
-  fec:{n:"🌙 Fechamento do Dia",t:"🌙 Fechamento do dia ({data})\n\nMeta: {meta}\nVendido: {vendido} ({pct})\n{status}\n\n{equipe_vendas}\n\nParabéns pelo trabalho de hoje, equipe! ❤️"},
+  bom:{n:"☀️ Bom dia e Meta do Dia",t:"☀️ Bom dia, equipe!\n\nHoje ({data}) nossa meta na loja é {meta}.\nMeta base por pessoa: {indiv} | Meta PA: {pa}.\nFoco do dia: {foco}\n\nVamos com experimentação no balcão, kits presente e encantamento! ❤️"},
+  par:{n:"📊 Parcial do Dia",t:"📊 Parcial do dia ({data})\n\nVendido até agora: {vendido}\nMeta do dia: {meta} ({pct})\nFalta: {falta}\n\n{equipe_vendas}\n\nRitmo necessário: {porhora}/h até o fechamento. Foco em {foco}! 🔥"},
+  fec:{n:"🌙 Fechamento e Repasse do Dia",t:"🌙 Fechamento do dia ({data})\n\nMeta: {meta}\nVendido: {vendido} ({pct})\n{status}\n\n{equipe_vendas}\n\nPendências abertas:\n{pendencias}\n\nReposição / Estoque:\n{reposicao}\n\nParabéns pelo trabalho de hoje, equipe! ❤️"},
   esc:{n:"📅 Aviso de Escala",t:"📅 Aviso de escala da semana\n\n{escala}\n\nQualquer troca, falar comigo com antecedência. Obrigada!"}
 };
 var DEF={
-  theme:"light",meta:"",vend:"",hrs:"",nv:"",calc:{v:"",d:"",p:"",j:""},edit:false,
+  theme:"light",meta:"",vend:"",hrs:"",nv:"",pa_meta:"",foco_dia:"",calc:{v:"",d:"",p:"",j:""},edit:false,
   chk:{
     Abertura:["Ligar luzes, som e ar-condicionado","Conferir caixa e troco","Verificar vitrines, provadores e preços","Alinhar meta e destaques do dia com a equipe","Checar limpeza e aromatização da loja"],
     Turno:["Acompanhar parcial da meta e vendas da equipe","Fazer reposição de estoque e testadores","Revisar atendimento e abordagem no salão","Responder clientes no WhatsApp","Conferir pausas e horários da equipe"],
@@ -346,17 +364,29 @@ var DEF={
   done:{},pend:[],sell:[],esc:{},sales:[],msgs:{},fm:"",fv:"",tab:0,rank:{},com:"",estq:[],cont:[],hist:[],note:""
 };
 var S=JSON.parse(JSON.stringify(DEF));
+function normalizeState(obj){
+  var base=JSON.parse(JSON.stringify(DEF));
+  if(obj&&typeof obj==="object"){
+    for(var k in obj)if(obj[k]!==undefined)base[k]=obj[k];
+  }
+  if(!Array.isArray(base.sell))base.sell=[];
+  if(!Array.isArray(base.sales))base.sales=[];
+  if(!Array.isArray(base.pend))base.pend=[];
+  if(!Array.isArray(base.estq))base.estq=[];
+  if(!Array.isArray(base.cont))base.cont=[];
+  if(!Array.isArray(base.hist))base.hist=[];
+  if(!base.rank||typeof base.rank!=="object")base.rank={};
+  if(!base.esc||typeof base.esc!=="object")base.esc={};
+  if(!base.msgs||typeof base.msgs!=="object")base.msgs={};
+  if(!base.calc||typeof base.calc!=="object")base.calc={v:"",d:"",p:"",j:""};
+  if(!base.chk||typeof base.chk!=="object")base.chk=JSON.parse(JSON.stringify(DEF.chk));
+  if(!base.done||typeof base.done!=="object")base.done={};
+  return base;
+}
 try{
   var raw=localStorage.getItem("ag_v1");
-  if(raw){
-    var o=JSON.parse(raw);
-    for(var k in o)if(o[k]!==undefined)S[k]=o[k];
-  }
+  if(raw)S=normalizeState(JSON.parse(raw));
 }catch(e){}
-if(!Array.isArray(S.sell))S.sell=[];
-if(!Array.isArray(S.sales))S.sales=[];
-if(!S.rank||typeof S.rank!=="object")S.rank={};
-if(!S.esc||typeof S.esc!=="object")S.esc={};
 
 function save(){try{localStorage.setItem("ag_v1",JSON.stringify(S))}catch(e){}}
 var $=function(i){return document.getElementById(i)};
@@ -381,7 +411,7 @@ function go(i){
     return '<button class="'+(j===i?"on":"")+'" onclick="go('+j+')"><b>'+x[0]+'</b>'+x[1]+'</button>';
   }).join("");
   if(i===0){rSales();}
-  if(i===2){rGrade();}
+  if(i===2){rTodayShift();rGrade();}
   if(i===3){rMsgs();}
   if(i===4){rMais();}
   window.scrollTo(0,0);
@@ -425,6 +455,23 @@ function addSale(){
   if(sumLogs>=n(S.rank[sid]))S.rank[sid]=String(sumLogs);
   valIn.value="";
   if(obsIn)obsIn.value="";
+  save();
+  rSales();
+  if($("t4").classList.contains("on")){rRank();com();}
+}
+function editSale(id){
+  var item=S.sales.find(function(x){return x.id===id;});
+  if(!item)return;
+  var novoValStr=prompt("Novo valor da venda (R$):",String(item.val).replace(".",","));
+  if(novoValStr===null)return;
+  var novoVal=n(novoValStr);
+  if(novoVal<=0){alert("Valor inválido. Nenhuma alteração feita.");return;}
+  var novaObs=prompt("Observação da venda:",item.obs||"");
+  if(novaObs===null)return;
+  item.val=novoVal;
+  item.obs=novaObs.trim();
+  var sumLogs=S.sales.filter(function(x){return x.sid===item.sid;}).reduce(function(a,b){return a+n(b.val);},0);
+  S.rank[item.sid]=sumLogs>0?String(sumLogs):"";
   save();
   rSales();
   if($("t4").classList.contains("on")){rRank();com();}
@@ -509,12 +556,13 @@ function rSales(){
   var mapName={};S.sell.forEach(function(s){mapName[s.id]=s.n;});
   recEl.innerHTML=
     '<h3>Últimos lançamentos ('+S.sales.length+')</h3>'+
-    S.sales.slice(0,12).map(function(item){
+    S.sales.slice(0,15).map(function(item){
       return '<div class="sale-item">'+
         '<div class="grow"><b>'+esc(mapName[item.sid]||"Vendedor")+'</b> · <span class="tag">'+esc(item.hora||"")+'</span>'+
           (item.obs?'<div class="v-sub">'+esc(item.obs)+'</div>':"")+
         '</div>'+
         '<b>'+R(n(item.val))+'</b>'+
+        '<button class="ed" onclick="editSale(\''+item.id+'\')" title="Editar lançamento">✏️</button>'+
         '<button class="x" onclick="delSale(\''+item.id+'\')" title="Remover lançamento">✕</button>'+
       '</div>';
     }).join("");
@@ -527,6 +575,7 @@ function stats(){
 }
 function mv(){
   S.meta=$("meta").value;S.vend=$("vend").value;S.hrs=$("hrs").value;S.nv=$("nv").value;
+  S.pa_meta=$("pa_meta").value;S.foco_dia=$("foco_dia").value;
   save();rMeta();
 }
 function rMeta(){
@@ -534,6 +583,11 @@ function rMeta(){
   $("barf").style.width=s.pct+"%";
   $("bar").classList.toggle("ok",s.m>0&&s.f===0);
   $("pct").textContent=s.m>0?(s.f===0?"🎉 Meta batida! ":"")+s.pct.toFixed(1).replace(".",",")+"% da meta":"Informe a meta para começar";
+  var focoTxt=(S.foco_dia||"").trim();
+  var paTxt=(S.pa_meta||"").trim();
+  $("focusPreview").innerHTML=(focoTxt||paTxt)
+    ?'<div class="focus-banner">'+(focoTxt?'<b>Foco do dia:</b> '+esc(focoTxt):'')+(focoTxt&&paTxt?' · ':'')+(paTxt?'<b>Meta PA:</b> '+esc(paTxt):'')+'</div>'
+    :"";
   var k=function(l,v,w){return '<div class="kpi'+(w?" wide":"")+'"><small>'+l+'</small><b>'+v+'</b></div>';};
   $("kpis").innerHTML=
     k("Falta para a meta",R(s.f),1)+
@@ -591,6 +645,29 @@ function rPend(){
 }
 
 /* ESCALA & VENDEDORES */
+function todayIndex(){var d=new Date().getDay();return d===0?6:d-1;}
+function rTodayShift(){
+  var el=$("todayShift");if(!el)return;
+  if(!S.sell.length){el.innerHTML='<div class="empty">Cadastre os vendedores abaixo para visualizar o turno de hoje.</div>';return;}
+  var d=todayIndex(),nomeDia=DIAS[d];
+  var g={M:[],T:[],I:[],F:[],V:[],N:[]};
+  S.sell.forEach(function(s){
+    var v=(S.esc[s.id]&&S.esc[s.id][d])||0;
+    var code=OPT[v]||"N";
+    g[code].push(s.n);
+  });
+  var box=function(lbl,arr){
+    return '<div class="today-box"><small>'+lbl+'</small><b>'+(arr.length?esc(arr.join(", ")):"—")+'</b></div>';
+  };
+  el.innerHTML=
+    '<div class="v-sub" style="margin-bottom:4px">Escala automática de <b>'+nomeDia+'</b> ('+new Date().toLocaleDateString("pt-BR")+')</div>'+
+    '<div class="today-grid">'+
+      box("☀️ Manhã",g.M)+
+      box("🌤️ Tarde",g.T)+
+      box("⏱️ Integral",g.I)+
+      box("🌴 Folga / Férias",g.F.concat(g.V))+
+    '</div>';
+}
 function addSell(){
   var v=$("sn").value.trim();
   var g=$("sm")?$("sm").value:"";
@@ -601,10 +678,11 @@ function addSell(){
   $("sn").value="";
   if($("sm"))$("sm").value="";
   save();
+  rTodayShift();
   rGrade();
   rSales();
 }
-function cyc(id,d){var a=S.esc[id];a[d]=(a[d]+1)%6;save();rGrade()}
+function cyc(id,d){var a=S.esc[id];a[d]=(a[d]+1)%6;save();rTodayShift();rGrade()}
 function editOrRemoveSell(i){
   var s=S.sell[i];if(!s)return;
   var escolha=prompt(
@@ -618,7 +696,7 @@ function editOrRemoveSell(i){
       delete S.rank[s.id];
       S.sales=S.sales.filter(function(x){return x.sid!==s.id;});
       S.sell.splice(i,1);
-      save();rGrade();rSales();
+      save();rTodayShift();rGrade();rSales();
     }
     return;
   }
@@ -627,7 +705,8 @@ function editOrRemoveSell(i){
 }
 function rGrade(){
   if(!S.sell.length){$("grade").innerHTML='<div class="empty">Cadastre os vendedores acima.</div>';return;}
-  var h="<table><thead><tr><th></th>"+DIAS.map(function(d){return"<th>"+d+"</th>"}).join("")+"</tr></thead><tbody>";
+  var tdToday=todayIndex();
+  var h="<table><thead><tr><th></th>"+DIAS.map(function(d,idx){return"<th"+(idx===tdToday?' style="color:var(--ac)"':'')+">"+d+"</th>"}).join("")+"</tr></thead><tbody>";
   S.sell.forEach(function(s,i){
     var gTag=n(s.goal)>0?' <small style="color:var(--mut);font-weight:400">('+R(n(s.goal))+')</small>':"";
     h+='<tr><td class="n" onclick="editOrRemoveSell('+i+')">'+esc(s.n)+gTag+"</td>"+
@@ -649,6 +728,16 @@ function escText(){
 }
 
 /* MENSAGENS */
+function pendingSummaryText(){
+  var open=S.pend.filter(function(p){return !p.d;});
+  if(!open.length)return"• Nenhuma pendência aberta.";
+  return open.map(function(p){return "• ["+p.c+"] "+p.t;}).join("\n");
+}
+function stockSummaryText(){
+  var open=S.estq.filter(function(p){return !p.d;});
+  if(!open.length)return"• Nenhuma reposição pendente.";
+  return open.map(function(p){return "• "+p.t;}).join("\n");
+}
 function fill(t){
   var s=stats();
   if($("fm")&&$("fm").value!==""){s.m=n($("fm").value)}
@@ -664,7 +753,11 @@ function fill(t){
     indiv:R(s.iv),porhora:s.h>0?R(s.ph):"—",
     status:s.f===0&&s.m>0?"Meta batida! 🎉":"Ficou faltando "+R(s.f),
     escala:escText(),
-    equipe_vendas:teamSalesSummaryText()
+    equipe_vendas:teamSalesSummaryText(),
+    foco:(S.foco_dia||"").trim()||"Encantamento e venda adicional",
+    pa:(S.pa_meta||"").trim()||"—",
+    pendencias:pendingSummaryText(),
+    reposicao:stockSummaryText()
   };
   return t.replace(/\{(\w+)\}/g,function(a,k){return k in V?V[k]:a});
 }
@@ -754,11 +847,22 @@ function rHist(){
     ?h.map(function(x,i){var p=x.m>0?x.v/x.m*100:0;return '<div class="row"><span class="grow">'+x.d+'<br><small class="tag">'+R(x.v)+' de '+R(x.m)+'</small></span><b style="color:var(--'+(p>=100?"ok":"bad")+')">'+p.toFixed(0)+'%</b><button class="x" onclick="S.hist.splice('+i+',1);save();rHist()">✕</button></div>';}).join("")+'<div class="kpis"><div class="kpi"><small>Média vendida</small><b>'+R(h.reduce(function(c,x){return c+x.v;},0)/h.length)+'</b></div><div class="kpi"><small>Metas batidas</small><b>'+h.filter(function(x){return x.m>0&&x.v>=x.m;}).length+"/"+h.length+'</b></div></div>'
     :'<div class="empty">Nenhum fechamento salvo ainda.</div>';
 }
+function bkDownload(){
+  try{
+    var blob=new Blob([JSON.stringify(S,null,2)],{type:"application/json"});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement("a");
+    var dt=new Date().toISOString().slice(0,10);
+    a.href=url;a.download="backup-assistente-bia-"+dt+".json";
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url)},1000);
+  }catch(e){alert("Não foi possível baixar o arquivo neste navegador. Use 'Copiar backup'.");}
+}
 function bkImp(){
   try{
     var o=JSON.parse($("m_bk").value);
     if(!o||typeof o!=="object")throw 0;
-    S=Object.assign(S,o);save();location.reload();
+    S=normalizeState(o);save();location.reload();
   }catch(e){
     $("m_bk").value="";$("m_bk").placeholder="Backup inválido. Cole novamente.";
   }
@@ -766,8 +870,9 @@ function bkImp(){
 
 /* INIT */
 $("meta").value=S.meta;$("vend").value=S.vend;$("hrs").value=S.hrs;$("nv").value=S.nv;
+$("pa_meta").value=S.pa_meta||"";$("foco_dia").value=S.foco_dia||"";
 $("cv").value=S.calc.v;$("cd").value=S.calc.d;$("cp").value=S.calc.p;$("cj").value=S.calc.j;
-setTheme(S.theme);rMeta();calc();rCheck();rPend();rGrade();rSales();go(S.tab||0);
+setTheme(S.theme);rMeta();calc();rCheck();rPend();rTodayShift();rGrade();rSales();go(S.tab||0);
 </script>
 </body>
 </html>
